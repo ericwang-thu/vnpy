@@ -266,5 +266,3 @@ if __name__ == '__main__':
     
     # 显示回测结果
     engine.showBacktestingResult()
-    
-    

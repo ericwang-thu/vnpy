@@ -126,11 +126,8 @@ def main():
     sleep(2)
     
     # 登陆，测试通过
-    loginReq = {}                           # 创建一个空字典
-    loginReq['UserID'] = ''                 # 参数作为字典键值的方式传入
-    loginReq['Password'] = ''               # 键名和C++中的结构体成员名对应
-    loginReq['BrokerID'] = ''    
-    reqid = reqid + 1                       # 请求数必须保持唯一性
+    loginReq = {'UserID': '', 'Password': '', 'BrokerID': ''}  # 创建一个空字典
+    reqid += 1  # 请求数必须保持唯一性
     i = api.reqUserLogin(loginReq, reqid)
     sleep(0.5)
     

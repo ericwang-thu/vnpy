@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-'''一个简单的通联数据客户端，主要使用requests开发，比通联官网的python例子更为简洁。'''
+"""一个简单的通联数据客户端，主要使用requests开发，比通联官网的python例子更为简洁。"""
 
 
 import requests
@@ -75,7 +75,3 @@ class DatayesClient(object):
                     elif 'message' in result:
                         print u'%s查询失败，返回信息%s' %(self.name, result['message'])
                     return None
-                    
-                    
-    
-    

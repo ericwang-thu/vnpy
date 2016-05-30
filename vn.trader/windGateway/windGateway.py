@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 Wind Python API的gateway接入
-'''
+"""
 
 from copy import copy
 
@@ -14,14 +14,8 @@ except ImportError:
 from vtGateway import *
 
 # 交易所类型映射
-exchangeMap = {}
-exchangeMap[EXCHANGE_SSE] = 'SH'
-exchangeMap[EXCHANGE_SZSE] = 'SZ'
-exchangeMap[EXCHANGE_CFFEX] = 'CFE'
-exchangeMap[EXCHANGE_SHFE] = 'SHF'
-exchangeMap[EXCHANGE_DCE] = 'DCE'
-exchangeMap[EXCHANGE_CZCE] = 'CZC'
-exchangeMap[EXCHANGE_UNKNOWN] = ''
+exchangeMap = {EXCHANGE_SSE: 'SH', EXCHANGE_SZSE: 'SZ', EXCHANGE_CFFEX: 'CFE', EXCHANGE_SHFE: 'SHF',
+               EXCHANGE_DCE: 'DCE', EXCHANGE_CZCE: 'CZC', EXCHANGE_UNKNOWN: ''}
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 
@@ -29,43 +23,16 @@ exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 class WindGateway(VtGateway):
     """Wind接口"""
     # 订阅wsq时传入的字段列表
-    wsqParamMap = {}
-    wsqParamMap['rt_last'] = 'lastPrice'
-    wsqParamMap['rt_last_vol'] = 'volume'
-    wsqParamMap['rt_oi'] = 'openInterest'
+    wsqParamMap = {'rt_last': 'lastPrice', 'rt_last_vol': 'volume', 'rt_oi': 'openInterest', 'rt_open': 'openPrice',
+                   'rt_high': 'highPrice', 'rt_low': 'lowPrice', 'rt_pre_close': 'preClosePrice',
+                   'rt_high_limit': 'upperLimit', 'rt_low_limit': 'lowerLimit', 'rt_bid1': 'bidPrice1',
+                   'rt_bid2': 'bidPrice2', 'rt_bid3': 'bidPrice3', 'rt_bid4': 'bidPrice4', 'rt_bid5': 'bidPrice5',
+                   'rt_ask1': 'askPrice1', 'rt_ask2': 'askPrice2', 'rt_ask3': 'askPrice3', 'rt_ask4': 'askPrice4',
+                   'rt_ask5': 'askPrice5', 'rt_bsize1': 'bidVolume1', 'rt_bsize2': 'bidVolume2',
+                   'rt_bsize3': 'bidVolume3', 'rt_bsize4': 'bidVolume4', 'rt_bsize5': 'bidVolume5',
+                   'rt_asize1': 'askVolume1', 'rt_asize2': 'askVolume2', 'rt_asize3': 'askVolume3',
+                   'rt_asize4': 'askVolume4', 'rt_asize5': 'askVolume5'}
 
-    wsqParamMap['rt_open'] = 'openPrice'
-    wsqParamMap['rt_high'] = 'highPrice'
-    wsqParamMap['rt_low'] = 'lowPrice'
-    wsqParamMap['rt_pre_close'] = 'preClosePrice'
-                    
-    wsqParamMap['rt_high_limit'] = 'upperLimit'
-    wsqParamMap['rt_low_limit'] = 'lowerLimit'
-
-    wsqParamMap['rt_bid1'] = 'bidPrice1'
-    wsqParamMap['rt_bid2'] = 'bidPrice2'
-    wsqParamMap['rt_bid3'] = 'bidPrice3'
-    wsqParamMap['rt_bid4'] = 'bidPrice4'
-    wsqParamMap['rt_bid5'] = 'bidPrice5'
-                    
-    wsqParamMap['rt_ask1'] = 'askPrice1'
-    wsqParamMap['rt_ask2'] = 'askPrice2'
-    wsqParamMap['rt_ask3'] = 'askPrice3'
-    wsqParamMap['rt_ask4'] = 'askPrice4'
-    wsqParamMap['rt_ask5'] = 'askPrice5'     
-                    
-    wsqParamMap['rt_bsize1'] = 'bidVolume1'
-    wsqParamMap['rt_bsize2'] = 'bidVolume2'
-    wsqParamMap['rt_bsize3'] = 'bidVolume3'
-    wsqParamMap['rt_bsize4'] = 'bidVolume4'
-    wsqParamMap['rt_bsize5'] = 'bidVolume5'
-                    
-    wsqParamMap['rt_asize1'] = 'askVolume1'
-    wsqParamMap['rt_asize2'] = 'askVolume2'
-    wsqParamMap['rt_asize3'] = 'askVolume3'
-    wsqParamMap['rt_asize4'] = 'askVolume4'
-    wsqParamMap['rt_asize5'] = 'askVolume5'
-    
     wsqParam = ','.join(wsqParamMap.keys())
 
     #----------------------------------------------------------------------

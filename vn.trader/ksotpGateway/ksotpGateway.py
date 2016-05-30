@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.ksotp的gateway接入
-'''
+"""
 
 
 import os
@@ -15,40 +15,27 @@ from vtGateway import *
 
 # 以下为一些VT类型和CTP类型的映射字典
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = defineDict["KS_OTP_OPT_LimitPrice"]
-priceTypeMap[PRICETYPE_MARKETPRICE] = defineDict["KS_OTP_OPT_AnyPrice"]
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: defineDict["KS_OTP_OPT_LimitPrice"],
+                PRICETYPE_MARKETPRICE: defineDict["KS_OTP_OPT_AnyPrice"]}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = defineDict['KS_OTP_D_Buy']
-directionMap[DIRECTION_SHORT] = defineDict['KS_OTP_D_Sell']
+directionMap = {DIRECTION_LONG: defineDict['KS_OTP_D_Buy'], DIRECTION_SHORT: defineDict['KS_OTP_D_Sell']}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = defineDict['KS_OTP_OF_Open']
-offsetMap[OFFSET_CLOSE] = defineDict['KS_OTP_OF_Close']
-offsetMap[OFFSET_CLOSETODAY] = defineDict['KS_OTP_OF_CloseToday']
-offsetMap[OFFSET_CLOSEYESTERDAY] = defineDict['KS_OTP_OF_CloseYesterday']
+offsetMap = {OFFSET_OPEN: defineDict['KS_OTP_OF_Open'], OFFSET_CLOSE: defineDict['KS_OTP_OF_Close'],
+             OFFSET_CLOSETODAY: defineDict['KS_OTP_OF_CloseToday'],
+             OFFSET_CLOSEYESTERDAY: defineDict['KS_OTP_OF_CloseYesterday']}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 # 交易所类型映射
-exchangeMap = {}
-exchangeMap[EXCHANGE_CFFEX] = 'CFFEX'
-exchangeMap[EXCHANGE_SHFE] = 'SHFE'
-exchangeMap[EXCHANGE_CZCE] = 'CZCE'
-exchangeMap[EXCHANGE_DCE] = 'DCE'
-exchangeMap[EXCHANGE_SSE] = 'SSE'
-exchangeMap[EXCHANGE_SZSE] = 'SZSE'
-exchangeMap[EXCHANGE_UNKNOWN] = ''
+exchangeMap = {EXCHANGE_CFFEX: 'CFFEX', EXCHANGE_SHFE: 'SHFE', EXCHANGE_CZCE: 'CZCE', EXCHANGE_DCE: 'DCE',
+               EXCHANGE_SSE: 'SSE', EXCHANGE_SZSE: 'SZSE', EXCHANGE_UNKNOWN: ''}
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 持仓类型映射
-posiDirectionMap = {}
-posiDirectionMap[DIRECTION_LONG] = defineDict["KSVOC_PD_Buy"]
-posiDirectionMap[DIRECTION_SHORT] = defineDict["KSVOC_PD_Sell"]
+posiDirectionMap = {DIRECTION_LONG: defineDict["KSVOC_PD_Buy"], DIRECTION_SHORT: defineDict["KSVOC_PD_Sell"]}
 posiDirectionMapReverse = {v:k for k,v in posiDirectionMap.items()}
 
 
@@ -376,9 +363,7 @@ class KsotpMdApi(MdApi):
         # 这里的设计是，如果尚未登录就调用了订阅方法
         # 则先保存订阅请求，登录完成后会自动订阅
         if self.loginStatus:
-            req = {}
-            req['InstrumentID'] = subscribeReq.symbol
-            req['ExchangeID'] = subscribeReq.exchange
+            req = {'InstrumentID': subscribeReq.symbol, 'ExchangeID': subscribeReq.exchange}
             self.subscribeMarketData(req)
         self.subscribedSymbols.add(subscribeReq)   
         
@@ -387,10 +372,7 @@ class KsotpMdApi(MdApi):
         """登录"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)    
     
@@ -1161,10 +1143,7 @@ class KsotpTdApi(TdApi):
         """连接服务器"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)   
         
@@ -1172,18 +1151,14 @@ class KsotpTdApi(TdApi):
     def qryAccount(self):
         """查询账户"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID        
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryTradingAccount(req, self.reqID)
         
     #----------------------------------------------------------------------
     def qryPosition(self):
         """查询持仓"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryInvestorPosition(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -1192,12 +1167,8 @@ class KsotpTdApi(TdApi):
         self.reqID += 1
         self.orderRef += 1
         
-        req = {}
-        
-        req['InstrumentID'] = orderReq.symbol
-        req['LimitPrice'] = orderReq.price
-        req['VolumeTotalOriginal'] = orderReq.volume
-        
+        req = {'InstrumentID': orderReq.symbol, 'LimitPrice': orderReq.price, 'VolumeTotalOriginal': orderReq.volume}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
         try:
             req['OrderPriceType'] = priceTypeMap[orderReq.priceType]
@@ -1230,18 +1201,11 @@ class KsotpTdApi(TdApi):
         """撤单"""
         self.reqID += 1
 
-        req = {}
-        
-        req['InstrumentID'] = cancelOrderReq.symbol
-        req['ExchangeID'] = cancelOrderReq.exchange
-        req['OrderRef'] = cancelOrderReq.orderID
-        req['FrontID'] = cancelOrderReq.frontID
-        req['SessionID'] = cancelOrderReq.sessionID
-        
-        req['ActionFlag'] = defineDict['KS_OTP_AF_Delete']
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
-        
+        req = {'InstrumentID': cancelOrderReq.symbol, 'ExchangeID': cancelOrderReq.exchange,
+               'OrderRef': cancelOrderReq.orderID, 'FrontID': cancelOrderReq.frontID,
+               'SessionID': cancelOrderReq.sessionID, 'ActionFlag': defineDict['KS_OTP_AF_Delete'],
+               'BrokerID': self.brokerID, 'InvestorID': self.userID}
+
         self.reqOrderAction(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -1298,9 +1262,7 @@ class KsotpTdApi(TdApi):
             self.gateway.onLog(log)
             
             # 确认结算信息
-            req = {}
-            req['BrokerID'] = self.brokerID
-            req['InvestorID'] = self.userID
+            req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
             self.reqID += 1
             self.reqSettlementInfoConfirm(req, self.reqID)              
                 

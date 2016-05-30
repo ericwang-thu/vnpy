@@ -169,44 +169,13 @@ class TradeMonitor(QtGui.QTableWidget):
     dictLabels['OrderRef'] = u'报单号'
     dictLabels['OrderSysID'] = u'报单系统号'
 
-    dictDirection = {}
-    dictDirection['0'] = u'买'
-    dictDirection['1'] = u'卖'
-    dictDirection['2'] = u'ETF申购'
-    dictDirection['3'] = u'ETF赎回'
-    dictDirection['4'] = u'ETF现金替代'
-    dictDirection['5'] = u'债券入库'
-    dictDirection['6'] = u'债券出库'
-    dictDirection['7'] = u'配股'
-    dictDirection['8'] = u'转托管'
-    dictDirection['9'] = u'信用账户配股'
-    dictDirection['A'] = u'担保品买入'
-    dictDirection['B'] = u'担保品卖出'
-    dictDirection['C'] = u'担保品转入'
-    dictDirection['D'] = u'担保品转出'
-    dictDirection['E'] = u'融资买入'
-    dictDirection['F'] = u'融资卖出'
-    dictDirection['G'] = u'卖券还款'
-    dictDirection['H'] = u'买券还券'
-    dictDirection['I'] = u'直接还款'
-    dictDirection['J'] = u'直接换券'
-    dictDirection['K'] = u'余券划转'
-    dictDirection['L'] = u'OF申购'    
-    dictDirection['M'] = u'OF赎回'
-    dictDirection['N'] = u'SF拆分'
-    dictDirection['O'] = u'SF合并'
-    dictDirection['P'] = u'备兑'
-    dictDirection['Q'] = u'证券冻结/解冻'
-    dictDirection['R'] = u'行权'      
+    dictDirection = {'0': u'买', '1': u'卖', '2': u'ETF申购', '3': u'ETF赎回', '4': u'ETF现金替代', '5': u'债券入库', '6': u'债券出库',
+                     '7': u'配股', '8': u'转托管', '9': u'信用账户配股', 'A': u'担保品买入', 'B': u'担保品卖出', 'C': u'担保品转入',
+                     'D': u'担保品转出', 'E': u'融资买入', 'F': u'融资卖出', 'G': u'卖券还款', 'H': u'买券还券', 'I': u'直接还款', 'J': u'直接换券',
+                     'K': u'余券划转', 'L': u'OF申购', 'M': u'OF赎回', 'N': u'SF拆分', 'O': u'SF合并', 'P': u'备兑', 'Q': u'证券冻结/解冻',
+                     'R': u'行权'}
 
-    dictOffset = {}
-    dictOffset['0'] = u'开仓'
-    dictOffset['1'] = u'平仓'
-    dictOffset['2'] = u'强平'
-    dictOffset['3'] = u'平今'
-    dictOffset['4'] = u'平昨'
-    dictOffset['5'] = u'强减'
-    dictOffset['6'] = u'本地强平'
+    dictOffset = {'0': u'开仓', '1': u'平仓', '2': u'强平', '3': u'平今', '4': u'平昨', '5': u'强减', '6': u'本地强平'}
 
     #----------------------------------------------------------------------
     def __init__(self, eventEngine, parent=None):
@@ -273,10 +242,7 @@ class PositionMonitor(QtGui.QTableWidget):
     dictLabels['PositionCost'] = u'持仓成本'
     dictLabels['OpenCost'] = u'开仓成本'
 
-    dictPosiDirection = {}
-    dictPosiDirection['1'] = u'净'
-    dictPosiDirection['2'] = u'多'
-    dictPosiDirection['3'] = u'空'
+    dictPosiDirection = {'1': u'净', '2': u'多', '3': u'空'}
 
     #----------------------------------------------------------------------
     def __init__(self, eventEngine, parent=None):
@@ -367,44 +333,13 @@ class OrderMonitor(QtGui.QTableWidget):
     dictLabels['CancelTime'] = u'撤销时间'
     dictLabels['StatusMsg'] = u'状态信息'
 
-    dictDirection = {}
-    dictDirection['0'] = u'买'
-    dictDirection['1'] = u'卖'
-    dictDirection['2'] = u'ETF申购'
-    dictDirection['3'] = u'ETF赎回'
-    dictDirection['4'] = u'ETF现金替代'
-    dictDirection['5'] = u'债券入库'
-    dictDirection['6'] = u'债券出库'
-    dictDirection['7'] = u'配股'
-    dictDirection['8'] = u'转托管'
-    dictDirection['9'] = u'信用账户配股'
-    dictDirection['A'] = u'担保品买入'
-    dictDirection['B'] = u'担保品卖出'
-    dictDirection['C'] = u'担保品转入'
-    dictDirection['D'] = u'担保品转出'
-    dictDirection['E'] = u'融资买入'
-    dictDirection['F'] = u'融资卖出'
-    dictDirection['G'] = u'卖券还款'
-    dictDirection['H'] = u'买券还券'
-    dictDirection['I'] = u'直接还款'
-    dictDirection['J'] = u'直接换券'
-    dictDirection['K'] = u'余券划转'
-    dictDirection['L'] = u'OF申购'    
-    dictDirection['M'] = u'OF赎回'
-    dictDirection['N'] = u'SF拆分'
-    dictDirection['O'] = u'SF合并'
-    dictDirection['P'] = u'备兑'
-    dictDirection['Q'] = u'证券冻结/解冻'
-    dictDirection['R'] = u'行权'          
+    dictDirection = {'0': u'买', '1': u'卖', '2': u'ETF申购', '3': u'ETF赎回', '4': u'ETF现金替代', '5': u'债券入库', '6': u'债券出库',
+                     '7': u'配股', '8': u'转托管', '9': u'信用账户配股', 'A': u'担保品买入', 'B': u'担保品卖出', 'C': u'担保品转入',
+                     'D': u'担保品转出', 'E': u'融资买入', 'F': u'融资卖出', 'G': u'卖券还款', 'H': u'买券还券', 'I': u'直接还款', 'J': u'直接换券',
+                     'K': u'余券划转', 'L': u'OF申购', 'M': u'OF赎回', 'N': u'SF拆分', 'O': u'SF合并', 'P': u'备兑', 'Q': u'证券冻结/解冻',
+                     'R': u'行权'}
 
-    dictOffset = {}
-    dictOffset['0'] = u'开仓'
-    dictOffset['1'] = u'平仓'
-    dictOffset['2'] = u'强平'
-    dictOffset['3'] = u'平今'
-    dictOffset['4'] = u'平昨'
-    dictOffset['5'] = u'强减'
-    dictOffset['6'] = u'本地强平'    
+    dictOffset = {'0': u'开仓', '1': u'平仓', '2': u'强平', '3': u'平今', '4': u'平昨', '5': u'强减', '6': u'本地强平'}
 
     #----------------------------------------------------------------------
     def __init__(self, eventEngine, mainEngine, parent=None):
@@ -715,12 +650,9 @@ class LoginWidget(QtGui.QDialog):
     #----------------------------------------------------------------------
     def saveData(self):
         """保存数据"""
-        setting = {}
-        setting['userid'] = str(self.editUserID.text())
-        setting['password'] = str(self.editPassword.text())
-        setting['mdAddress'] = str(self.editMdAddress.text())
-        setting['tdAddress'] = str(self.editTdAddress.text())
-        setting['brokerid'] = str(self.editBrokerID.text())
+        setting = {'userid': str(self.editUserID.text()), 'password': str(self.editPassword.text()),
+                   'mdAddress': str(self.editMdAddress.text()), 'tdAddress': str(self.editTdAddress.text()),
+                   'brokerid': str(self.editBrokerID.text())}
 
         f = shelve.open('setting.vn')
         f['login'] = setting

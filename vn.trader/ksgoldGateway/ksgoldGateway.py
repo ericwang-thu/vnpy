@@ -1,11 +1,11 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.ksgold的gateway接入
 
 金仕达黄金接口在用户登录后，并不提供之前的Order和Trade数据主动推送，
 而是需要用户自行查询，因此API里做了初始化后的查询设计。
-'''
+"""
 
 import os
 import json
@@ -18,15 +18,11 @@ from vtGateway import *
 # 以下类型映射参考的是原生API里的Constant.h
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = '0'
-directionMap[DIRECTION_SHORT] = '1'
+directionMap = {DIRECTION_LONG: '0', DIRECTION_SHORT: '1'}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = '0'
-offsetMap[OFFSET_CLOSE] = '1'
+offsetMap = {OFFSET_OPEN: '0', OFFSET_CLOSE: '1'}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 
@@ -182,7 +178,7 @@ class KsgoldTdApi(TdApi):
         self.memberID = EMPTY_STRING        # 会员代码（应该是银行）
         self.address = EMPTY_STRING         # 服务器地址
         
-        self.seatID = EMPTY_STRING;         # 席位号
+        self.seatID = EMPTY_STRING  # 席位号
         self.tradeCode = EMPTY_STRING       # 交易编码
         
         self.subscribedSymbols = set()      # 已订阅合约代码    
@@ -680,10 +676,7 @@ class KsgoldTdApi(TdApi):
         """连接服务器"""
         # 如果填入了用户名密码等，则登录
         if self.accountID and self.password:
-            req = {}
-            req['accountID'] = self.accountID
-            req['password'] = self.password
-            req['loginType'] = 1
+            req = {'accountID': self.accountID, 'password': self.password, 'loginType': 1}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)  
         
@@ -717,14 +710,8 @@ class KsgoldTdApi(TdApi):
         self.reqID += 1
         self.orderRef += 1
         
-        req = {}
-        
-        req['instID'] = orderReq.symbol
-        req['marketID'] = '10'
-        
-        req['price'] = orderReq.price
-        req['amount'] = orderReq.volume
-        
+        req = {'instID': orderReq.symbol, 'marketID': '10', 'price': orderReq.price, 'amount': orderReq.volume}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
         try:
             req['buyOrSell'] = directionMap[orderReq.direction]
@@ -765,10 +752,8 @@ class KsgoldTdApi(TdApi):
         """撤单"""
         self.reqID += 1
 
-        req = {}
-        req['localOrderNo'] = cancelOrderReq.orderID
-        req['marketID'] = '10'  # API默认只允许交易T+D延期
-        
+        req = {'localOrderNo': cancelOrderReq.orderID, 'marketID': '10'}
+
         self.reqOrderAction(req, self.reqID)
     
     #----------------------------------------------------------------------

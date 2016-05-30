@@ -426,13 +426,3 @@ class VtCancelOrderReq(object):
         self.orderID = EMPTY_STRING             # 报单号
         self.frontID = EMPTY_STRING             # 前置机号
         self.sessionID = EMPTY_STRING           # 会话号
-  
-    
-    
-    
-    
-    
-
-    
-    
-    

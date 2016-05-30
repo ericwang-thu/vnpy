@@ -168,12 +168,8 @@ def main():
     sleep(0.5)
     
     # 登陆，测试通过
-    loginReq = {}                           # 创建一个空字典
-    loginReq['UserID'] = ''                 # 参数作为字典键值的方式传入
-    loginReq['Password'] = ''               # 键名和C++中的结构体成员名对应
-    loginReq['BrokerID'] = '2011'    
-    loginReq['DataLevel'] = '1'             # '0'全量行情  '1'10档  '2'5档
-    reqid = reqid + 1                       # 请求数必须保持唯一性
+    loginReq = {'UserID': '', 'Password': '', 'BrokerID': '2011', 'DataLevel': '1'}  # 创建一个空字典
+    reqid += 1  # 请求数必须保持唯一性
     i = api.reqUserLogin(loginReq, 1)
     sleep(0.5)
     
@@ -194,9 +190,7 @@ def main():
     #sleep(0.5)
     
     # 订阅L2合约，测试通过
-    subReq = {}
-    subReq['InstrumentID'] = '510050'
-    subReq['ExchangeID'] = 'SSE'
+    subReq = {'InstrumentID': '510050', 'ExchangeID': 'SSE'}
     i = api.subscribeL2MarketData(subReq)
     
     ## 退订L2合约，测试通过

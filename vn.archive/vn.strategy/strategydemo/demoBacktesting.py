@@ -22,10 +22,7 @@ if __name__ == '__main__':
     be.loadDataHistory(symbol, datetime(2015,5,1), datetime.today())
     
     # 创建策略对象
-    setting = {}
-    setting['fastAlpha'] = 0.2
-    setting['slowAlpha'] = 0.05
-    setting['startDate'] = datetime(year=2015, month=5, day=20)
+    setting = {'fastAlpha': 0.2, 'slowAlpha': 0.05, 'startDate': datetime(year=2015, month=5, day=20)}
     se.createStrategy(u'EMA演示策略', symbol, SimpleEmaStrategy, setting)
     
     # 启动所有策略

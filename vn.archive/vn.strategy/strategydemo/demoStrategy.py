@@ -288,9 +288,7 @@ def main():
     se = StrategyEngine(me.ee, me)
     
     # 创建策略对象
-    setting = {}
-    setting['fastAlpha'] = 0.2
-    setting['slowAlpha'] = 0.05
+    setting = {'fastAlpha': 0.2, 'slowAlpha': 0.05}
     se.createStrategy(u'EMA演示策略', 'IF1506', SimpleEmaStrategy, setting)
     
     # 启动所有策略
@@ -302,9 +300,3 @@ def main():
     
 if __name__ == '__main__':
     main()
-    
-    
-    
-    
-    
-    

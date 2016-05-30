@@ -66,11 +66,8 @@ class DemoMdApi(MdApi):
         
         # 如果用户已经填入了用户名等等，则自动尝试连接
         if self.__userid:
-            req = {}
-            req['UserID'] = self.__userid
-            req['Password'] = self.__password
-            req['BrokerID'] = self.__brokerid
-            self.__reqid = self.__reqid + 1
+            req = {'UserID': self.__userid, 'Password': self.__password, 'BrokerID': self.__brokerid}
+            self.__reqid += 1
             self.reqUserLogin(req, self.__reqid)
             
     #----------------------------------------------------------------------  
@@ -237,11 +234,8 @@ class DemoTdApi(TdApi):
         
         # 如果用户已经填入了用户名等等，则自动尝试连接
         if self.__userid:
-            req = {}
-            req['UserID'] = self.__userid
-            req['Password'] = self.__password
-            req['BrokerID'] = self.__brokerid
-            self.__reqid = self.__reqid + 1
+            req = {'UserID': self.__userid, 'Password': self.__password, 'BrokerID': self.__brokerid}
+            self.__reqid += 1
             self.reqUserLogin(req, self.__reqid)
     
     #----------------------------------------------------------------------
@@ -849,44 +843,36 @@ class DemoTdApi(TdApi):
     #----------------------------------------------------------------------
     def getInstrument(self):
         """查询合约"""
-        self.__reqid = self.__reqid + 1
+        self.__reqid += 1
         self.reqQryInstrument({}, self.__reqid)
         
     #----------------------------------------------------------------------
     def getAccount(self):
         """查询账户"""
-        self.__reqid = self.__reqid + 1
+        self.__reqid += 1
         self.reqQryTradingAccount({}, self.__reqid)
         
     #----------------------------------------------------------------------
     def getInvestor(self):
         """查询投资者"""
-        self.__reqid = self.__reqid + 1
+        self.__reqid += 1
         self.reqQryInvestor({}, self.__reqid)
         
     #----------------------------------------------------------------------
     def getPosition(self):
         """查询持仓"""
-        self.__reqid = self.__reqid + 1
-        req = {}
-        req['BrokerID'] = self.__brokerid
-        req['InvestorID'] = self.__userid
+        self.__reqid += 1
+        req = {'BrokerID': self.__brokerid, 'InvestorID': self.__userid}
         self.reqQryInvestorPosition(req, self.__reqid)
         
     #----------------------------------------------------------------------
     def sendOrder(self, instrumentid, exchangeid, price, pricetype, volume, direction, offset):
         """发单"""
-        self.__reqid = self.__reqid + 1
-        req = {}
-        
-        req['InstrumentID'] = instrumentid
-        req['OrderPriceType'] = pricetype
-        req['LimitPrice'] = price
-        req['VolumeTotalOriginal'] = volume
-        req['Direction'] = direction
-        req['CombOffsetFlag'] = offset
-        
-        self.__orderref = self.__orderref + 1
+        self.__reqid += 1
+        req = {'InstrumentID': instrumentid, 'OrderPriceType': pricetype, 'LimitPrice': price,
+               'VolumeTotalOriginal': volume, 'Direction': direction, 'CombOffsetFlag': offset}
+
+        self.__orderref += 1
         req['OrderRef'] = str(self.__orderref)
         
         req['InvestorID'] = self.__userid
@@ -908,39 +894,25 @@ class DemoTdApi(TdApi):
     #----------------------------------------------------------------------
     def cancelOrder(self, instrumentid, exchangeid, orderref, frontid, sessionid):
         """撤单"""
-        self.__reqid = self.__reqid + 1
-        req = {}
-        
-        req['InstrumentID'] = instrumentid
-        req['ExchangeID'] = exchangeid
-        req['OrderRef'] = orderref
-        req['FrontID'] = frontid
-        req['SessionID'] = sessionid   
-        
-        req['ActionFlag'] = defineDict['THOST_FTDC_AF_Delete']
-        req['BrokerID'] = self.__brokerid
-        req['InvestorID'] = self.__userid
-        
+        self.__reqid += 1
+        req = {'InstrumentID': instrumentid, 'ExchangeID': exchangeid, 'OrderRef': orderref, 'FrontID': frontid,
+               'SessionID': sessionid, 'ActionFlag': defineDict['THOST_FTDC_AF_Delete'], 'BrokerID': self.__brokerid,
+               'InvestorID': self.__userid}
+
         self.reqOrderAction(req, self.__reqid)
     
     #----------------------------------------------------------------------
     def getSettlement(self):
         """查询结算信息"""
-        self.__reqid = self.__reqid + 1
-        req = {}
-        
-        req['BrokerID'] = self.__brokerid
-        req['InvestorID'] = self.__userid
-        
+        self.__reqid += 1
+        req = {'BrokerID': self.__brokerid, 'InvestorID': self.__userid}
+
         self.reqQrySettlementInfo(req, self.__reqid)
         
     #----------------------------------------------------------------------
     def confirmSettlement(self):
         """确认结算信息"""
-        self.__reqid = self.__reqid + 1
-        req = {}
-        
-        req['BrokerID'] = self.__brokerid
-        req['InvestorID'] = self.__userid
-        
-        self.reqSettlementInfoConfirm(req, self.__reqid)    
+        self.__reqid += 1
+        req = {'BrokerID': self.__brokerid, 'InvestorID': self.__userid}
+
+        self.reqSettlementInfoConfirm(req, self.__reqid)

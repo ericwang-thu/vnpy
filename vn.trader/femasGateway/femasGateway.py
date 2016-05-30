@@ -1,10 +1,10 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.femas的gateway接入
 
 考虑到飞马只对接期货（目前只有中金所）, vtSymbol直接使用symbol
-'''
+"""
 
 
 import os
@@ -17,42 +17,31 @@ from vtGateway import *
 
 # 以下为一些VT类型和CTP类型的映射字典
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = defineDict["USTP_FTDC_OPT_LimitPrice"]
-priceTypeMap[PRICETYPE_MARKETPRICE] = defineDict["USTP_FTDC_OPT_AnyPrice"]
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: defineDict["USTP_FTDC_OPT_LimitPrice"],
+                PRICETYPE_MARKETPRICE: defineDict["USTP_FTDC_OPT_AnyPrice"]}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = defineDict['USTP_FTDC_D_Buy']
-directionMap[DIRECTION_SHORT] = defineDict['USTP_FTDC_D_Sell']
+directionMap = {DIRECTION_LONG: defineDict['USTP_FTDC_D_Buy'], DIRECTION_SHORT: defineDict['USTP_FTDC_D_Sell']}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = defineDict['USTP_FTDC_OF_Open']
-offsetMap[OFFSET_CLOSE] = defineDict['USTP_FTDC_OF_Close']
-offsetMap[OFFSET_CLOSETODAY] = defineDict['USTP_FTDC_OF_CloseToday']
-offsetMap[OFFSET_CLOSEYESTERDAY] = defineDict['USTP_FTDC_OF_CloseYesterday']
+offsetMap = {OFFSET_OPEN: defineDict['USTP_FTDC_OF_Open'], OFFSET_CLOSE: defineDict['USTP_FTDC_OF_Close'],
+             OFFSET_CLOSETODAY: defineDict['USTP_FTDC_OF_CloseToday'],
+             OFFSET_CLOSEYESTERDAY: defineDict['USTP_FTDC_OF_CloseYesterday']}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 # 交易所类型映射
-exchangeMap = {}
+exchangeMap = {EXCHANGE_CFFEX: 'CFFEX', EXCHANGE_SHFE: 'SHFE', EXCHANGE_CZCE: 'CZCE', EXCHANGE_DCE: 'DCE',
+               EXCHANGE_UNKNOWN: ''}
 #exchangeMap[EXCHANGE_CFFEX] = defineDict['USTP_FTDC_EIDT_CFFEX']
 #exchangeMap[EXCHANGE_SHFE] = defineDict['USTP_FTDC_EIDT_SHFE']
 #exchangeMap[EXCHANGE_CZCE] = defineDict['USTP_FTDC_EIDT_CZCE']
 #exchangeMap[EXCHANGE_DCE] = defineDict['USTP_FTDC_EIDT_DCE']
-exchangeMap[EXCHANGE_CFFEX] = 'CFFEX'
-exchangeMap[EXCHANGE_SHFE] = 'SHFE'
-exchangeMap[EXCHANGE_CZCE] = 'CZCE'
-exchangeMap[EXCHANGE_DCE] = 'DCE'
-exchangeMap[EXCHANGE_UNKNOWN] = ''
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 持仓类型映射
-posiDirectionMap = {}
-posiDirectionMap[DIRECTION_LONG] = defineDict["USTP_FTDC_D_Buy"]
-posiDirectionMap[DIRECTION_SHORT] = defineDict["USTP_FTDC_D_Sell"]
+posiDirectionMap = {DIRECTION_LONG: defineDict["USTP_FTDC_D_Buy"], DIRECTION_SHORT: defineDict["USTP_FTDC_D_Sell"]}
 posiDirectionMapReverse = {v:k for k,v in posiDirectionMap.items()}
 
 
@@ -394,10 +383,7 @@ class FemasMdApi(MdApi):
         """登录"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)    
     
@@ -470,10 +456,7 @@ class FemasTdApi(TdApi):
         """连接服务器"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)   
         
@@ -481,18 +464,14 @@ class FemasTdApi(TdApi):
     def qryAccount(self):
         """查询账户"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID        
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryInvestorAccount(req, self.reqID)
         
     #----------------------------------------------------------------------
     def qryPosition(self):
         """查询持仓"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryInvestorPosition(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -503,13 +482,9 @@ class FemasTdApi(TdApi):
         
         strLocalID = generateStrLocalID(self.localID)
         
-        req = {}
-        
-        req['InstrumentID'] = orderReq.symbol
-        req['ExchangeID'] = orderReq.exchange
-        req['LimitPrice'] = orderReq.price
-        req['Volume'] = orderReq.volume
-        
+        req = {'InstrumentID': orderReq.symbol, 'ExchangeID': orderReq.exchange, 'LimitPrice': orderReq.price,
+               'Volume': orderReq.volume}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
         try:
             req['OrderPriceType'] = priceTypeMap[orderReq.priceType]
@@ -543,16 +518,10 @@ class FemasTdApi(TdApi):
         self.localID += 1
         strLocalID = generateStrLocalID(self.localID)
 
-        req = {}
-        req['ExchangeID'] = cancelOrderReq.exchange
-        req['UserOrderLocalID'] = cancelOrderReq.orderID
-        req['UserOrderActionLocalID'] = strLocalID  # 飞马需要传入撤单编号字段，即该次撤单操作的唯一编号
-        
-        req['ActionFlag'] = defineDict['USTP_FTDC_AF_Delete']
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
-        req['UserID'] = self.userID     # 飞马需要传入UserID字段（CTP不用）
-        
+        req = {'ExchangeID': cancelOrderReq.exchange, 'UserOrderLocalID': cancelOrderReq.orderID,
+               'UserOrderActionLocalID': strLocalID, 'ActionFlag': defineDict['USTP_FTDC_AF_Delete'],
+               'BrokerID': self.brokerID, 'InvestorID': self.userID, 'UserID': self.userID}
+
         self.reqOrderAction(req, self.reqID)
         
     #----------------------------------------------------------------------

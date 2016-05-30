@@ -92,7 +92,7 @@ class MainEngine:
     #----------------------------------------------------------------------
     def getAccountPosition(self, event):
         """循环查询账户和持仓"""
-        self.countGet = self.countGet + 1
+        self.countGet += 1
         
         # 每5秒发一次查询
         if self.countGet > 5:
@@ -182,8 +182,6 @@ class MainEngine:
     def saveInstrument(self):
         """保存合约属性数据"""
         f = shelve.open('setting.vn')
-        d = {}
-        d['dictInstrument'] = self.dictInstrument
-        d['date'] = date.today()
+        d = {'dictInstrument': self.dictInstrument, 'date': date.today()}
         f['instrument'] = d
         f.close()

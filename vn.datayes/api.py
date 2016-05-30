@@ -1,19 +1,18 @@
-#encoding: UTF-8
+# encoding: UTF-8
 import os
 import json
 import time
 import requests
 import pymongo
 import pandas as pd
-
 from datetime import datetime, timedelta
 from Queue import Queue, Empty
 from threading import Thread, Timer
 from pymongo import MongoClient
-
 from requests.exceptions import ConnectionError
 from errors import (VNPAST_ConfigError, VNPAST_RequestError,
-VNPAST_DataConstructorError)
+					VNPAST_DataConstructorError)
+
 
 class Config(object):
 	"""
@@ -46,7 +45,7 @@ class Config(object):
 		'domain': 'api.wmcloud.com/data',
 		'version': 'v1',
 		'header': {
-			'Connection' : 'keep-alive',
+			'Connection': 'keep-alive',
 			'Authorization': 'Bearer ' + token
 		}
 	}
@@ -63,7 +62,7 @@ class Config(object):
 		"""
 		if head:
 			self.head = head
-		if token: 
+		if token:
 			self.token = token
 		if body:
 			self.body = body
@@ -71,15 +70,16 @@ class Config(object):
 	def view(self):
 		""" Prettify printing method. """
 		config_view = {
-			'config_head' : self.head,
-			'config_body' : self.body,
-			'user_token' : self.token
+			'config_head': self.head,
+			'config_body': self.body,
+			'user_token': self.token
 		}
-		print json.dumps(config_view, 
-						 indent=4, 
+		print json.dumps(config_view,
+						 indent=4,
 						 sort_keys=True)
 
-#----------------------------------------------------------------------
+
+# ----------------------------------------------------------------------
 # Data containers.
 
 class BaseDataContainer(object):
@@ -100,6 +100,7 @@ class BaseDataContainer(object):
 	head = 'ABSTRACT_DATA'
 	body = dict()
 	pass
+
 
 class History(BaseDataContainer):
 	"""
@@ -146,12 +147,13 @@ class History(BaseDataContainer):
 			self.body = pd.DataFrame(data['data'])
 		except AssertionError:
 			msg = '[{}]: Unable to construct history data; '.format(
-					self.head) + 'input is not a dataframe.'
+				self.head) + 'input is not a dataframe.'
 			raise VNPAST_DataConstructorError(msg)
-		except Exception,e:
+		except Exception, e:
 			msg = '[{}]: Unable to construct history data; '.format(
-					self.head) + str(e)
+				self.head) + str(e)
 			raise VNPAST_DataConstructorError(msg)
+
 
 class Bar(History):
 	"""
@@ -209,15 +211,15 @@ class Bar(History):
 			self.body = pd.DataFrame(data['data'][0]['barBodys'])
 		except AssertionError:
 			msg = '[{}]: Unable to construct history data; '.format(
-					self.head) + 'input is not a dataframe.'
+				self.head) + 'input is not a dataframe.'
 			raise VNPAST_DataConstructorError(msg)
-		except Exception,e:
+		except Exception, e:
 			msg = '[{}]: Unable to construct history data; '.format(
-					self.head) + str(e)
+				self.head) + str(e)
 			raise VNPAST_DataConstructorError(msg)
 
 
-#----------------------------------------------------------------------
+# ----------------------------------------------------------------------
 # Datayes Api class
 
 class PyApi(object):
@@ -275,7 +277,7 @@ class PyApi(object):
 				msg = '[API]: Unable to configure api; ' + \
 					  'config file is incomplete.'
 				raise VNPAST_ConfigError(msg)
-			except Exception,e:
+			except Exception, e:
 				msg = '[API]: Unable to configure api; ' + str(e)
 				raise VNPAST_ConfigError(msg)
 
@@ -299,19 +301,20 @@ class PyApi(object):
 		try:
 			assert type(url) == str
 			assert type(params) == dict
-		except AssertionError,e:
+		except AssertionError, e:
 			raise e('[API]: Unvalid url or parameter input.')
 		if not self._session:
 			s = requests.session()
-		else: s = self._session
+		else:
+			s = self._session
 
 		# prepare and send the request.
 		try:
 			req = requests.Request(method,
-								   url = url,
-								   headers = self._header,
-								   params = params)
-			prepped = s.prepare_request(req) # prepare the request
+								   url=url,
+								   headers=self._header,
+								   params=params)
+			prepped = s.prepare_request(req)  # prepare the request
 			resp = s.send(prepped, stream=False, verify=True)
 			if method == 'GET':
 				assert resp.status_code == 200
@@ -323,15 +326,15 @@ class PyApi(object):
 				  str(resp.status_code)
 			raise VNPAST_RequestError(msg)
 			pass
-		except Exception,e:
+		except Exception, e:
 			msg = '[API]: Bad request.' + str(e)
 			raise VNPAST_RequestError(msg)
 
-	#----------------------------------------------------------------------
+	# ----------------------------------------------------------------------
 	# directly get methods - Market data
 
 	def get_equity_M1_one(self,
-					  	  start='', end='', secID='000001.XSHG'):
+						  start='', end='', secID='000001.XSHG'):
 		"""
 		Get 1-minute intraday bar data of one security.
 
@@ -347,7 +350,7 @@ class PyApi(object):
 
 		"""
 		url = '{}/{}/api/market/getBarRTIntraDay.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'startTime': start,
 			'endTime': end,
@@ -359,10 +362,10 @@ class PyApi(object):
 			print resp.json()
 			data = Bar(resp.json())
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
-
-	def get_equity_M1(self, field='', start='20130701', end='20130730', 
+	def get_equity_M1(self, field='', start='20130701', end='20130730',
 					  secID='000001.XSHG', output='df'):
 		"""
 		1-minute bar in a month, currently unavailable.
@@ -381,7 +384,7 @@ class PyApi(object):
 
 		"""
 		url = '{}/{}/api/market/getBarHistDateRange.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'startDate': start,
@@ -396,8 +399,8 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data'][0]['barBodys']
 			return data
-		except AssertionError: return 0
-
+		except AssertionError:
+			return 0
 
 	def get_equity_D1(self, field='', start='', end='', secID='',
 					  ticker='', one=20150513, output='df'):
@@ -456,10 +459,10 @@ class PyApi(object):
 
 		"""
 		if start and end and ticker:
-			one = '' # while user specifies start/end, covers tradeDate.
+			one = ''  # while user specifies start/end, covers tradeDate.
 
 		url = '{}/{}/api/market/getMktEqud.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -476,8 +479,9 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data']
 			return data
-			#return resp
-		except AssertionError: return 0
+		# return resp
+		except AssertionError:
+			return 0
 
 	def get_block_D1(self, field='', start='', end='', secID='',
 					 ticker='', one=20150513):
@@ -529,10 +533,10 @@ class PyApi(object):
 
 		"""
 		if start and end and ticker:
-			one = '' # while user specifies start/end, covers tradeDate.
+			one = ''  # while user specifies start/end, covers tradeDate.
 
 		url = '{}/{}/api/market/getMktBondd.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -549,10 +553,11 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data']
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_future_D1(self, field='', start='', end='', secID='',
-					ticker='', one=20150513, output='df'):
+					  ticker='', one=20150513, output='df'):
 		"""
 		Get 1-day interday bar data of one future contract.
 
@@ -592,10 +597,10 @@ class PyApi(object):
 		  Same as above, reference: get_equity_D1().
 		"""
 		if start and end and ticker:
-			one = '' # while user specifies start/end, covers tradeDate.
+			one = ''  # while user specifies start/end, covers tradeDate.
 
 		url = '{}/{}/api/market/getMktFutd.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -612,7 +617,8 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data']
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_future_main_D1(self, field='', start='', end='', mark='',
 						   obj='', main=1, one=20150513):
@@ -658,10 +664,10 @@ class PyApi(object):
 
 		"""
 		if start and end and ticker:
-			one = '' # while user specifies start/end, covers tradeDate.
+			one = ''  # while user specifies start/end, covers tradeDate.
 
 		url = '{}/{}/api/market/getMktFundd.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -678,7 +684,8 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data']
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_index_D1(self, field='', start='', end='', indexID='',
 					 ticker='', one=20150513, output='df'):
@@ -715,10 +722,10 @@ class PyApi(object):
 
 		"""
 		if start and end and ticker:
-			one = '' # while user specifies start/end, covers tradeDate.
+			one = ''  # while user specifies start/end, covers tradeDate.
 
 		url = '{}/{}/api/market/getMktIdxd.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -735,10 +742,11 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data']
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_option_D1(self, field='', start='', end='', secID='',
-					  optID='' ,ticker='', one=20150513, output='df'):
+					  optID='', ticker='', one=20150513, output='df'):
 		"""
 		Get 1-day interday bar data of one option contact.
 
@@ -772,10 +780,10 @@ class PyApi(object):
 
 		"""
 		if start and end and ticker:
-			one = '' # while user specifies start/end, covers tradeDate.
+			one = ''  # while user specifies start/end, covers tradeDate.
 
 		url = '{}/{}/api/market/getMktOptd.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -793,10 +801,11 @@ class PyApi(object):
 			elif output == 'list':
 				data = resp.json()['data']
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_stockFactor_D1(self, field='', secID='',
-					  	   ticker='000001', start=20130701, end=20130801):
+						   ticker='000001', start=20130701, end=20130801):
 		"""
 		Get 1-day interday factor data for stocks.
 
@@ -811,7 +820,7 @@ class PyApi(object):
 		  Same as above, reference: get_equity_D1().
 		"""
 		url = '{}/{}/api/market/getStockFactorsDateRange.json'.format(
-			   self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'beginDate': start,
@@ -824,9 +833,10 @@ class PyApi(object):
 			assert len(resp.json()) > 0
 			data = History(resp.json())
 			return data
-		except AssertionError: return 0
-		
-	#----------------------------------------------------------------------
+		except AssertionError:
+			return 0
+
+	# ----------------------------------------------------------------------
 	# directly get methods - Fundamental Data
 
 	def get_balanceSheet(self, field='', secID='',
@@ -836,7 +846,7 @@ class PyApi(object):
 
 		"""
 		url = '{}/{}/api/fundamental/getFdmtBS.json'.format(
-			  self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'secID': secID,
@@ -852,7 +862,8 @@ class PyApi(object):
 			assert len(resp.json()) > 0
 			data = History(resp.json())
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_balanceSheet_bnk(self):
 		"""
@@ -885,7 +896,7 @@ class PyApi(object):
 
 		"""
 		url = '{}/{}/api/fundamental/getFdmtCF.json'.format(
-			  self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'secID': secID,
@@ -901,7 +912,8 @@ class PyApi(object):
 			assert len(resp.json()) > 0
 			data = History(resp.json())
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_cashFlow_bnk(self):
 		"""
@@ -928,13 +940,13 @@ class PyApi(object):
 		pass
 
 	def get_incomeStatement(self, field='', secID='',
-					 		start='', end='', pubStart='', pubEnd='',
-					 		reportType='', ticker='000001'):
+							start='', end='', pubStart='', pubEnd='',
+							reportType='', ticker='000001'):
 		"""
 
 		"""
 		url = '{}/{}/api/fundamental/getFdmtIS.json'.format(
-			  self._domain, self._version)
+			self._domain, self._version)
 		params = {
 			'field': field,
 			'secID': secID,
@@ -950,7 +962,8 @@ class PyApi(object):
 			assert len(resp.json()) > 0
 			data = History(resp.json())
 			return data
-		except AssertionError: return 0
+		except AssertionError:
+			return 0
 
 	def get_incomeStatement_bnk(self):
 		"""
@@ -976,11 +989,11 @@ class PyApi(object):
 		"""
 		pass
 
-	#----------------------------------------------------------------------
+	# ----------------------------------------------------------------------
 	# multi-threading download for database storage.
 
 	def __drudgery(self, id, db, indexType,
-				  start, end, tasks, target):
+				   start, end, tasks, target):
 		"""
 		basic drudgery function.
 		This method loops over a list of tasks(tickers) and get data using
@@ -1018,13 +1031,13 @@ class PyApi(object):
 
 		# str to datetime inline functions.
 		if indexType == 'date':
-			todt = lambda str_dt: datetime.strptime(str_dt,'%Y-%m-%d')
-			update_dt = lambda d: d.update({'date':todt(d['tradeDate'])})
+			todt = lambda str_dt: datetime.strptime(str_dt, '%Y-%m-%d')
+			update_dt = lambda d: d.update({'date': todt(d['tradeDate'])})
 		elif indexType == 'datetime':
 			todt = lambda str_d, str_t: datetime.strptime(
-				str_d + ' ' + str_t,'%Y-%m-%d %H:%M')
+				str_d + ' ' + str_t, '%Y-%m-%d %H:%M')
 			update_dt = lambda d: d.update(
-				{'dateTime':todt(d['dataDate'], d['barTime'])})
+				{'dateTime': todt(d['dataDate'], d['barTime'])})
 		else:
 			raise ValueError
 
@@ -1032,12 +1045,12 @@ class PyApi(object):
 		k, n = 1, len(tasks)
 		for ticker in tasks:
 			try:
-				data = target(start = start,
-							  end = end, 
-							  ticker = ticker,
-							  output = 'list')
+				data = target(start=start,
+							  end=end,
+							  ticker=ticker,
+							  output='list')
 				assert len(data) >= 1
-				map(update_dt, data) # add datetime feature to docs.
+				map(update_dt, data)  # add datetime feature to docs.
 				coll = db[ticker]
 				coll.insert_many(data)
 				print '[API|Session{}]: '.format(id) + \
@@ -1055,75 +1068,87 @@ class PyApi(object):
 				print msg
 				pass
 
-	def get_equity_D1_drudgery(self, id, db, start, end, tasks=[]):
+	def get_equity_D1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		call __drudgery targeting at get_equity_D1()
 		"""
+		if not tasks:
+			tasks = []
 		self.__drudgery(id=id, db=db,
-					   indexType = 'date',
-					   start = start, 
-					   end = end, 
-					   tasks = tasks,
-					   target = self.get_equity_D1)
+						indexType='date',
+						start=start,
+						end=end,
+						tasks=tasks,
+						target=self.get_equity_D1)
 
-	def get_future_D1_drudgery(self, id, db, start, end, tasks=[]):
+	def get_future_D1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		call __drudgery targeting at get_future_D1()
 		"""
-		self.__drudgery(id=id, db=db, 
-					   indexType = 'date',
-					   start = start, 
-					   end = end, 
-					   tasks = tasks,
-					   target = self.get_future_D1)
+		if not tasks:
+			tasks = []
+		self.__drudgery(id=id, db=db,
+						indexType='date',
+						start=start,
+						end=end,
+						tasks=tasks,
+						target=self.get_future_D1)
 
-	def get_index_D1_drudgery(self, id, db, start, end, tasks=[]):
+	def get_index_D1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		call __drudgery targeting at get_index_D1()
 		"""
-		self.__drudgery(id=id, db=db, 
-					   indexType = 'date',
-					   start = start, 
-					   end = end, 
-					   tasks = tasks,
-					   target = self.get_index_D1)
+		if not tasks:
+			tasks = []
+		self.__drudgery(id=id, db=db,
+						indexType='date',
+						start=start,
+						end=end,
+						tasks=tasks,
+						target=self.get_index_D1)
 
-	def get_bond_D1_drudgery(self, id, db, start, end, tasks=[]):
+	def get_bond_D1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		call __drudgery targeting at get_bond_D1()
 		"""
-		self.__drudgery(id=id, db=db, 
-					   indexType = 'date',
-					   start = start, 
-					   end = end, 
-					   tasks = tasks,
-					   target = self.get_bond_D1)
+		if not tasks:
+			tasks = []
+		self.__drudgery(id=id, db=db,
+						indexType='date',
+						start=start,
+						end=end,
+						tasks=tasks,
+						target=self.get_bond_D1)
 
-	def get_fund_D1_drudgery(self, id, db, start, end, tasks=[]):
+	def get_fund_D1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		call __drudgery targeting at get_fund_D1()
 		"""
-		self.__drudgery(id=id, db=db, 
-					   indexType = 'date',
-					   start = start, 
-					   end = end, 
-					   tasks = tasks,
-					   target = self.get_fund_D1)
+		if not tasks:
+			tasks = []
+		self.__drudgery(id=id, db=db,
+						indexType='date',
+						start=start,
+						end=end,
+						tasks=tasks,
+						target=self.get_fund_D1)
 
-	def get_option_D1_drudgery(self, id, db, start, end, tasks=[]):
+	def get_option_D1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		call __drudgery targeting at get_option_D1()
 		"""
-		self.__drudgery(id=id, db=db, 
-					   indexType = 'date',
-					   start = start, 
-					   end = end, 
-					   tasks = tasks,
-					   target = self.get_option_D1)
+		if not tasks:
+			tasks = []
+		self.__drudgery(id=id, db=db,
+						indexType='date',
+						start=start,
+						end=end,
+						tasks=tasks,
+						target=self.get_option_D1)
 
-	#----------------------------------------------------------------------
+	# ----------------------------------------------------------------------
 
-	def __overlord(self, db, start, end, dName, 
+	def __overlord(self, db, start, end, dName,
 				   target1, target2, sessionNum):
 		"""
 		Basic controller of multithreading request.
@@ -1154,20 +1179,20 @@ class PyApi(object):
 		"""
 		if os.path.isfile(dName):
 			# if directory exists, read from it.
-			jsonFile = open(dName,'r')
+			jsonFile = open(dName, 'r')
 			allTickers = json.loads(jsonFile.read())
 			jsonFile.close()
 		else:
 			data = target1()
 			allTickers = list(data.body['ticker'])
-		
-		chunkSize = len(allTickers)/sessionNum
-		taskLists = [allTickers[k:k+chunkSize] for k in range(
-						0, len(allTickers), chunkSize)]
+
+		chunkSize = len(allTickers) / sessionNum
+		taskLists = [allTickers[k:k + chunkSize] for k in range(
+			0, len(allTickers), chunkSize)]
 		k = 0
 		for tasks in taskLists:
-			thrd = Thread(target = target2,
-						  args = (k, db, start, end, tasks))
+			thrd = Thread(target=target2,
+						  args=(k, db, start, end, tasks))
 			thrd.start()
 			k += 1
 		return 1
@@ -1176,73 +1201,73 @@ class PyApi(object):
 		"""
 		Controller of get equity D1 method.
 		"""
-		self.__overlord(db = db,
-						start = start,
-						end = end,
-						dName = 'names/equTicker.json',
-						target1 = self.get_equity_D1,
-						target2 = self.get_equity_D1_drudgery,
-						sessionNum = sessionNum)
+		self.__overlord(db=db,
+						start=start,
+						end=end,
+						dName='names/equTicker.json',
+						target1=self.get_equity_D1,
+						target2=self.get_equity_D1_drudgery,
+						sessionNum=sessionNum)
 
 	def get_future_D1_mongod(self, db, start, end, sessionNum=30):
 		"""
 		Controller of get future D1 method.
 		"""
-		self.__overlord(db = db,
-						start = start,
-						end = end,
-						dName = 'names/futTicker.json',
-						target1 = self.get_future_D1,
-						target2 = self.get_future_D1_drudgery,
-						sessionNum = sessionNum)
+		self.__overlord(db=db,
+						start=start,
+						end=end,
+						dName='names/futTicker.json',
+						target1=self.get_future_D1,
+						target2=self.get_future_D1_drudgery,
+						sessionNum=sessionNum)
 
 	def get_index_D1_mongod(self, db, start, end, sessionNum=30):
 		"""
 		Controller of get index D1 method.
 		"""
-		self.__overlord(db = db,
-						start = start,
-						end = end,
-						dName = 'names/idxTicker.json',
-						target1 = self.get_index_D1,
-						target2 = self.get_index_D1_drudgery,
-						sessionNum = sessionNum)
+		self.__overlord(db=db,
+						start=start,
+						end=end,
+						dName='names/idxTicker.json',
+						target1=self.get_index_D1,
+						target2=self.get_index_D1_drudgery,
+						sessionNum=sessionNum)
 
 	def get_bond_D1_mongod(self, db, start, end, sessionNum=30):
 		"""
 		Controller of get bond D1 method.
 		"""
-		self.__overlord(db = db,
-						start = start,
-						end = end,
-						dName = 'names/bndTicker.json',
-						target1 = self.get_bond_D1,
-						target2 = self.get_bond_D1_drudgery,
-						sessionNum = sessionNum)
+		self.__overlord(db=db,
+						start=start,
+						end=end,
+						dName='names/bndTicker.json',
+						target1=self.get_bond_D1,
+						target2=self.get_bond_D1_drudgery,
+						sessionNum=sessionNum)
 
 	def get_fund_D1_mongod(self, db, start, end, sessionNum=30):
 		"""
 		Controller of get fund D1 method.
 		"""
-		self.__overlord(db = db,
-						start = start,
-						end = end,
-						dName = 'names/fudTicker.json',
-						target1 = self.get_fund_D1,
-						target2 = self.get_fund_D1_drudgery,
-						sessionNum = sessionNum)
+		self.__overlord(db=db,
+						start=start,
+						end=end,
+						dName='names/fudTicker.json',
+						target1=self.get_fund_D1,
+						target2=self.get_fund_D1_drudgery,
+						sessionNum=sessionNum)
 
 	def get_option_D1_mongod(self, db, start, end, sessionNum=30):
 		"""
 		Controller of get option D1 method.
 		"""
-		self.__overlord(db = db,
-						start = start,
-						end = end,
-						dName = 'names/optTicker.json',
-						target1 = self.get_option_D1,
-						target2 = self.get_option_D1_drudgery,
-						sessionNum = sessionNum)
+		self.__overlord(db=db,
+						start=start,
+						end=end,
+						dName='names/optTicker.json',
+						target1=self.get_option_D1,
+						target2=self.get_option_D1_drudgery,
+						sessionNum=sessionNum)
 
 	def get_equity_D1_mongod_(self, db, start, end, sessionNum=30):
 		"""
@@ -1266,30 +1291,28 @@ class PyApi(object):
 		dName = 'names/equTicker.json'
 		if os.path.isfile(dName):
 			# if directory exists, read from it.
-			jsonFile = open(dName,'r')
+			jsonFile = open(dName, 'r')
 			allTickers = json.loads(jsonFile.read())
 			jsonFile.close()
 		else:
 			data = self.get_equity_D1()
 			allTickers = list(data.body['ticker'])
-			
-		chunkSize = len(allTickers)/sessionNum
-		taskLists = [allTickers[k:k+chunkSize] for k in range(
-						0, len(allTickers), chunkSize)]
+
+		chunkSize = len(allTickers) / sessionNum
+		taskLists = [allTickers[k:k + chunkSize] for k in range(
+			0, len(allTickers), chunkSize)]
 		k = 0
 		for tasks in taskLists:
-			thrd = Thread(target = self.get_equity_D1_drudgery,
-						  args = (k, db, start, end, tasks))
+			thrd = Thread(target=self.get_equity_D1_drudgery,
+						  args=(k, db, start, end, tasks))
 			thrd.start()
 			k += 1
 		return 1
 
-
-	#----------------------------------------------------------------------#
+	# ----------------------------------------------------------------------#
 	# to be deprecated
 
-	def get_equity_D1_drudgery_(self, id, db, 
-							    start, end, tasks=[]):
+	def get_equity_D1_drudgery_(self, id, db, start, end, tasks=None):
 		"""
 		Drudgery function of getting equity_D1 bars.
 		This method loops over a list of tasks(tickers) and get D1 bar
@@ -1313,31 +1336,33 @@ class PyApi(object):
 		  loops over.
 
 		"""
+		if not tasks:
+			tasks = []
 		if len(tasks) == 0:
 			return 0
 		# str to datetime inline functions.
-		todt = lambda str_dt: datetime.strptime(str_dt,'%Y-%m-%d')
-		update_dt = lambda d: d.update({'date':todt(d['tradeDate'])})
+		todt = lambda str_dt: datetime.strptime(str_dt, '%Y-%m-%d')
+		update_dt = lambda d: d.update({'date': todt(d['tradeDate'])})
 		# loop over all tickers in task list.
 		k, n = 1, len(tasks)
 		for ticker in tasks:
 			try:
-				data = self.get_equity_D1(start = start,
-										  end = end, 
-										  ticker = ticker,
-										  output = 'list')
+				data = self.get_equity_D1(start=start,
+										  end=end,
+										  ticker=ticker,
+										  output='list')
 				assert len(data) >= 1
-				map(update_dt, data) # add datetime feature to docs.
+				map(update_dt, data)  # add datetime feature to docs.
 				coll = db[ticker]
 				coll.insert_many(data)
 				print '[API|Session{}]: '.format(id) + \
 					  'Finished {} in {}.'.format(k, n)
 				k += 1
 			except ConnectionError:
-			# If choke connection, standby for 1sec an invoke again.
+				# If choke connection, standby for 1sec an invoke again.
 				time.sleep(1)
 				self.get_equity_D1_drudgery(
-					 id, db, start, end, tasks)
+					id, db, start, end, tasks)
 			except AssertionError:
 				msg = '[API|Session{}]: '.format(id) + \
 					  'Empty dataset in the response.'
@@ -1372,28 +1397,27 @@ class PyApi(object):
 		dName = 'names/equTicker.json'
 		if os.path.isfile(dName):
 			# if directory exists, read from it.
-			jsonFile = open(dName,'r')
+			jsonFile = open(dName, 'r')
 			allTickers = json.loads(jsonFile.read())
 			jsonFile.close()
 		else:
 			data = self.get_equity_D1()
 			allTickers = list(data.body['ticker'])
-			
-		chunkSize = len(allTickers)/sessionNum
-		taskLists = [allTickers[k:k+chunkSize] for k in range(
-						0, len(allTickers), chunkSize)]
+
+		chunkSize = len(allTickers) / sessionNum
+		taskLists = [allTickers[k:k + chunkSize] for k in range(
+			0, len(allTickers), chunkSize)]
 		k = 0
 		for tasks in taskLists:
-			thrd = Thread(target = self.get_equity_D1_drudgery,
-						  args = (k, db, start, end, tasks))
+			thrd = Thread(target=self.get_equity_D1_drudgery,
+						  args=(k, db, start, end, tasks))
 			thrd.start()
 			k += 1
 		return 1
 
-	#----------------------------------------------------------------------#
+	# ----------------------------------------------------------------------#
 
-	def get_equity_M1_drudgery(self, id, db, 
-							   start, end, tasks=[]):
+	def get_equity_M1_drudgery(self, id, db, start, end, tasks=None):
 		"""
 		Drudgery function of getting equity_D1 bars.
 		This method loops over a list of tasks(tickers) and get D1 bar
@@ -1419,33 +1443,35 @@ class PyApi(object):
 		  loops over.
 
 		"""
+		if not tasks:
+			tasks = []
 		if len(tasks) == 0:
 			return 0
 
 		# str to datetime inline functions.
 		todt = lambda str_d, str_t: datetime.strptime(
-				str_d + ' ' + str_t,'%Y-%m-%d %H:%M')
+			str_d + ' ' + str_t, '%Y-%m-%d %H:%M')
 		update_dt = lambda d: d.update(
-				{'dateTime':todt(d['dataDate'], d['barTime'])})
+			{'dateTime': todt(d['dataDate'], d['barTime'])})
 
 		k, n = 1, len(tasks)
 		for secID in tasks:
 			try:
-				data = self.get_equity_M1(start = start,
-										  end = end, 
-										  secID = secID,
-										  output = 'list')
-				map(update_dt, data) # add datetime feature to docs.
+				data = self.get_equity_M1(start=start,
+										  end=end,
+										  secID=secID,
+										  output='list')
+				map(update_dt, data)  # add datetime feature to docs.
 				coll = db[secID]
 				coll.insert_many(data)
 				print '[API|Session{}]: '.format(id) + \
 					  'Finished {} in {}.'.format(k, n)
 				k += 1
 			except ConnectionError:
-			# If choke connection, standby for 1sec an invoke again.
+				# If choke connection, standby for 1sec an invoke again.
 				time.sleep(1)
 				self.get_equity_D1_drudgery(
-					 id, db, start, end, tasks)
+					id, db, start, end, tasks)
 			except AssertionError:
 				msg = '[API|Session{}]: '.format(id) + \
 					  'Empty dataset in the response.'
@@ -1458,10 +1484,7 @@ class PyApi(object):
 				print msg
 				pass
 
-	def get_equity_M1_interMonth(self, db, id,
-							     startYr=datetime.now().year-2, 
-							     endYr=datetime.now().year, 
-							     tasks=[]):
+	def get_equity_M1_interMonth(self, db, id, startYr=datetime.now().year - 2, endYr=datetime.now().year, tasks=None):
 		"""
 		Mid-level wrapper of get equity M1 method. 
 		Get 1-minute bar between specified start year and ending year for
@@ -1497,30 +1520,31 @@ class PyApi(object):
 		  where chunkSize = len(allTickers)/sessionNum.
 
 		"""
+		if not tasks:
+			tasks = []
 		# Construct yyyymmdd strings.(as ymdStrings list)
 		now = datetime.now()
-		years = [str(y) for y in range(startYr, endYr+1)]
-		monthDates = [(2-len(str(k)))*'0'+str(k)+'02' for k in range(1,13)]
-		ymdStringStart = [y+md for y in years for md in monthDates if (
-					  	  datetime.strptime(y+md,'%Y%m%d')<=now)]
-		monthDates = [(2-len(str(k)))*'0'+str(k)+'01' for k in range(1,13)]
-		ymdStringEnd = [y+md for y in years for md in monthDates if (
-					  	datetime.strptime(y+md,'%Y%m%d')<=now)]
+		years = [str(y) for y in range(startYr, endYr + 1)]
+		monthDates = [(2 - len(str(k))) * '0' + str(k) + '02' for k in range(1, 13)]
+		ymdStringStart = [y + md for y in years for md in monthDates if (
+			datetime.strptime(y + md, '%Y%m%d') <= now)]
+		monthDates = [(2 - len(str(k))) * '0' + str(k) + '01' for k in range(1, 13)]
+		ymdStringEnd = [y + md for y in years for md in monthDates if (
+			datetime.strptime(y + md, '%Y%m%d') <= now)]
 		k = 0
-		for t in range(len(ymdStringEnd)-1):
+		for t in range(len(ymdStringEnd) - 1):
 			start = ymdStringStart[t]
-			end = ymdStringEnd[t+1]
+			end = ymdStringEnd[t + 1]
 			subID = str(id) + '_' + str(k)
-			thrd = Thread(target = self.get_equity_M1_drudgery,
-						  args = (subID, db, start, end, tasks))
+			thrd = Thread(target=self.get_equity_M1_drudgery,
+						  args=(subID, db, start, end, tasks))
 			thrd.start()
 			k += 1
 
-
-	def get_equity_M1_all(self, db, 
-							 startYr=datetime.now().year-2, 
-							 endYr=datetime.now().year, 
-							 splitNum=10):
+	def get_equity_M1_all(self, db,
+						  startYr=datetime.now().year - 2,
+						  endYr=datetime.now().year,
+						  splitNum=10):
 		"""
 
 
@@ -1557,4 +1581,3 @@ class PyApi(object):
 		return 1
 		"""
 		pass
-		

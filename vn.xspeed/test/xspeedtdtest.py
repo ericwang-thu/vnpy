@@ -269,19 +269,9 @@ def main():
     def sendOrder(api, symbol, price, volume, reqid):
         """发单"""
 
-        req = {}
-        req['accountID'] = api.accountID
-        req['instrumentID'] = symbol
-        req['buySellType'] = 1
-        req['openCloseType'] = 1
-        req['localOrderID'] = 1
-        req['insertPrice'] = price
-        req['orderAmount'] = volume
-        req['speculator'] = 0
-        req['orderProperty'] = '0'
-        req['orderType'] = 1
-        req['instrumentType'] = 0
-        req['insertType'] = 0x0001
+        req = {'accountID': api.accountID, 'instrumentID': symbol, 'buySellType': 1, 'openCloseType': 1,
+               'localOrderID': 1, 'insertPrice': price, 'orderAmount': volume, 'speculator': 0, 'orderProperty': '0',
+               'orderType': 1, 'instrumentType': 0, 'insertType': 0x0001}
 
         i = api.reqInsertOrder(req)
 
@@ -290,21 +280,17 @@ def main():
     def cancelOrder(api, orderRef, reqid):
         """撤单"""
 
-        req = {}
-
-        req['accountID'] = api.accountID
-        req['instrumentID'] = 'i1605'
-        req['localOrderID'] = orderRef
+        req = {'accountID': api.accountID, 'instrumentID': 'i1605', 'localOrderID': orderRef}
 
         i = api.reqCancelOrder(req)
         return i
 
     # 发单测试， 测试通过
-    reqid = reqid + 1
+    reqid += 1
     sendOrder(api, 'i1605', 299, 1, reqid)
     sleep(3)
     # 撤单测试， 待测试
-    reqid = reqid + 1
+    reqid += 1
     cancelOrder(api, 1, reqid)
 
     input()

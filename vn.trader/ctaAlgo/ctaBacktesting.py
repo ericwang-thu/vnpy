@@ -1,9 +1,9 @@
 # encoding: UTF-8
 
-'''
+"""
 本文件中包含的是CTA模块的回测引擎，回测引擎的API和CTA引擎一致，
 可以使用和实盘相同的代码进行回测。
-'''
+"""
 
 from datetime import datetime, timedelta
 from collections import OrderedDict
@@ -577,5 +577,3 @@ if __name__ == '__main__':
     # spyder或者ipython notebook中运行时，会弹出盈亏曲线图
     # 直接在cmd中回测则只会打印一些回测数值
     engine.showBacktestingResult()
-    
-    

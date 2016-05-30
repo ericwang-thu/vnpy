@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-'''
+"""
 ibpy的gateway接入
 
 注意事项：
@@ -9,7 +9,7 @@ ibpy的gateway接入
 3. ib api的持仓和账户更新可以订阅成主推模式，因此qryAccount和qryPosition就用不到了
 4. 目前只支持股票和期货交易，ib api里期权合约的确定是基于Contract对象的多个字段，比较复杂暂时没做
 5. 海外市场的交易规则和国内有很多细节上的不同，所以一些字段类型的映射可能不合理，如果发现问题欢迎指出
-'''
+"""
 
 import os
 import json
@@ -29,34 +29,24 @@ from vtGateway import *
 
 # 以下为一些VT类型和CTP类型的映射字典
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = 'LMT'
-priceTypeMap[PRICETYPE_MARKETPRICE] = 'MKT'
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: 'LMT', PRICETYPE_MARKETPRICE: 'MKT'}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = 'BUY'
+directionMap = {DIRECTION_LONG: 'BUY', DIRECTION_SHORT: 'SELL'}
 #directionMap[DIRECTION_SHORT] = 'SSHORT'   # SSHORT在IB系统中代表对股票的融券做空（而不是国内常见的卖出）
-directionMap[DIRECTION_SHORT] = 'SELL'      # 出于和国内的统一性考虑，这里选择把IB里的SELL印射为vt的SHORT
 
 directionMapReverse = {v: k for k, v in directionMap.items()}
 directionMapReverse['BOT'] = DIRECTION_LONG
 directionMapReverse['SLD'] = DIRECTION_SHORT
 
 # 交易所类型映射
-exchangeMap = {}
-exchangeMap[EXCHANGE_SMART] = 'SMART'
-exchangeMap[EXCHANGE_NYMEX] = 'NYMEX'
-exchangeMap[EXCHANGE_GLOBEX] = 'GLOBEX'
-exchangeMap[EXCHANGE_IDEALPRO] = 'IDEALPRO'
+exchangeMap = {EXCHANGE_SMART: 'SMART', EXCHANGE_NYMEX: 'NYMEX', EXCHANGE_GLOBEX: 'GLOBEX',
+               EXCHANGE_IDEALPRO: 'IDEALPRO'}
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 报单状态映射
-orderStatusMap = {}
-orderStatusMap[STATUS_NOTTRADED] = 'Submitted'
-orderStatusMap[STATUS_ALLTRADED] = 'Filled'
-orderStatusMap[STATUS_CANCELLED] = 'Cancelled'
+orderStatusMap = {STATUS_NOTTRADED: 'Submitted', STATUS_ALLTRADED: 'Filled', STATUS_CANCELLED: 'Cancelled'}
 orderStatusMapReverse = {v:k for k,v in orderStatusMap.items()}
 orderStatusMapReverse['PendingSubmit'] = STATUS_UNKNOWN     # 这里未来视乎需求可以拓展vt订单的状态类型
 orderStatusMapReverse['PendingCancel'] = STATUS_UNKNOWN
@@ -64,47 +54,24 @@ orderStatusMapReverse['PreSubmitted'] = STATUS_UNKNOWN
 orderStatusMapReverse['Inactive'] = STATUS_UNKNOWN
 
 # 合约类型映射
-productClassMap = {}
-productClassMap[PRODUCT_EQUITY] = 'STK'
-productClassMap[PRODUCT_FUTURES] = 'FUT'
-productClassMap[PRODUCT_OPTION] = 'OPT'
-productClassMap[PRODUCT_FOREX] = 'CASH'
+productClassMap = {PRODUCT_EQUITY: 'STK', PRODUCT_FUTURES: 'FUT', PRODUCT_OPTION: 'OPT', PRODUCT_FOREX: 'CASH'}
 productClassMapReverse = {v:k for k,v in productClassMap.items()}
 
 # 期权类型映射
-optionTypeMap = {}
-optionTypeMap[OPTION_CALL] = 'CALL'
-optionTypeMap[OPTION_PUT] = 'PUT'
+optionTypeMap = {OPTION_CALL: 'CALL', OPTION_PUT: 'PUT'}
 optionTypeMap = {v:k for k,v in optionTypeMap.items()}
 
 # 货币类型映射
-currencyMap = {}
-currencyMap[CURRENCY_USD] = 'USD'
-currencyMap[CURRENCY_CNY] = 'CNY'
+currencyMap = {CURRENCY_USD: 'USD', CURRENCY_CNY: 'CNY'}
 currencyMap = {v:k for k,v in currencyMap.items()}
 
 # Tick数据的Field和名称映射
-tickFieldMap = {}
-tickFieldMap[0] = 'bidVolume1'
-tickFieldMap[1] = 'bidPrice1'
-tickFieldMap[2] = 'askPrice1'
-tickFieldMap[3] = 'askVolume1'
-tickFieldMap[4] = 'lastPrice'
-tickFieldMap[5] = 'lastVolume'
-tickFieldMap[6] = 'highPrice'
-tickFieldMap[7] = 'lowPrice'
-tickFieldMap[8] = 'volume'
-tickFieldMap[9] = 'preClosePrice'
-tickFieldMap[14] = 'openPrice'
-tickFieldMap[22] = 'openInterest'
+tickFieldMap = {0: 'bidVolume1', 1: 'bidPrice1', 2: 'askPrice1', 3: 'askVolume1', 4: 'lastPrice', 5: 'lastVolume',
+                6: 'highPrice', 7: 'lowPrice', 8: 'volume', 9: 'preClosePrice', 14: 'openPrice', 22: 'openInterest'}
 
 # Account数据Key和名称的映射
-accountKeyMap = {}
-accountKeyMap['NetLiquidationByCurrency'] = 'balance'
-accountKeyMap['NetLiquidation'] = 'balance'
-accountKeyMap['UnrealizedPnL'] = 'positionProfit'
-accountKeyMap['AvailableFunds'] = 'available'
-accountKeyMap['MaintMarginReq'] = 'margin'
+accountKeyMap = {'NetLiquidationByCurrency': 'balance', 'NetLiquidation': 'balance', 'UnrealizedPnL': 'positionProfit',
+                 'AvailableFunds': 'available', 'MaintMarginReq': 'margin'}
 
 
 ########################################################################
@@ -559,7 +526,7 @@ class IbWrapper(EWrapper):
 
     #----------------------------------------------------------------------
     def scannerData(self, reqId, rank, contractDetails, distance, benchmark, projection, legsStr):
-        ''' generated source for method scannerData '''
+        """ generated source for method scannerData """
         pass
 
     #----------------------------------------------------------------------

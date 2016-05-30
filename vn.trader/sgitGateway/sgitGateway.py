@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.sgit的gateway接入
 
 飞鼠接口的委托数据更新是分散在多个推送里的：
@@ -14,7 +14,7 @@ vn.sgit的gateway接入
 
 飞鼠的撤单需要使用：交易所代码+交易所的系统委托号，撤单时从缓存中
 获取委托的系统编号
-'''
+"""
 
 
 import os
@@ -27,48 +27,36 @@ from vtGateway import *
 
 # 以下为一些VT类型和SGIT类型的映射字典
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = defineDict["Sgit_FTDC_OPT_LimitPrice"]
-priceTypeMap[PRICETYPE_MARKETPRICE] = defineDict["Sgit_FTDC_OPT_AnyPrice"]
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: defineDict["Sgit_FTDC_OPT_LimitPrice"],
+                PRICETYPE_MARKETPRICE: defineDict["Sgit_FTDC_OPT_AnyPrice"]}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = defineDict['Sgit_FTDC_D_Buy']
-directionMap[DIRECTION_SHORT] = defineDict['Sgit_FTDC_D_Sell']
+directionMap = {DIRECTION_LONG: defineDict['Sgit_FTDC_D_Buy'], DIRECTION_SHORT: defineDict['Sgit_FTDC_D_Sell']}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = defineDict['Sgit_FTDC_OF_Open']
-offsetMap[OFFSET_CLOSE] = defineDict['Sgit_FTDC_OF_Close']
-offsetMap[OFFSET_CLOSETODAY] = defineDict['Sgit_FTDC_OF_CloseToday']
-offsetMap[OFFSET_CLOSEYESTERDAY] = defineDict['Sgit_FTDC_OF_CloseYesterday']
+offsetMap = {OFFSET_OPEN: defineDict['Sgit_FTDC_OF_Open'], OFFSET_CLOSE: defineDict['Sgit_FTDC_OF_Close'],
+             OFFSET_CLOSETODAY: defineDict['Sgit_FTDC_OF_CloseToday'],
+             OFFSET_CLOSEYESTERDAY: defineDict['Sgit_FTDC_OF_CloseYesterday']}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 # 交易所类型映射
-exchangeMap = {}
-exchangeMap[EXCHANGE_CFFEX] = defineDict['Sgit_FTDC_EIDT_CFFEX']
-exchangeMap[EXCHANGE_SHFE] = defineDict['Sgit_FTDC_EIDT_SHFE']
-exchangeMap[EXCHANGE_CZCE] = defineDict['Sgit_FTDC_EIDT_CZCE']
-exchangeMap[EXCHANGE_DCE] = defineDict['Sgit_FTDC_EIDT_DCE']
-exchangeMap[EXCHANGE_SGE] = defineDict['Sgit_FTDC_EIDT_GOLD']
-exchangeMap[EXCHANGE_UNKNOWN] = ''
+exchangeMap = {EXCHANGE_CFFEX: defineDict['Sgit_FTDC_EIDT_CFFEX'], EXCHANGE_SHFE: defineDict['Sgit_FTDC_EIDT_SHFE'],
+               EXCHANGE_CZCE: defineDict['Sgit_FTDC_EIDT_CZCE'], EXCHANGE_DCE: defineDict['Sgit_FTDC_EIDT_DCE'],
+               EXCHANGE_SGE: defineDict['Sgit_FTDC_EIDT_GOLD'], EXCHANGE_UNKNOWN: ''}
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 持仓类型映射
-posiDirectionMap = {}
-posiDirectionMap[DIRECTION_NET] = defineDict["Sgit_FTDC_PD_Net"]
-posiDirectionMap[DIRECTION_LONG] = defineDict["Sgit_FTDC_PD_Long"]
-posiDirectionMap[DIRECTION_SHORT] = defineDict["Sgit_FTDC_PD_Short"]
+posiDirectionMap = {DIRECTION_NET: defineDict["Sgit_FTDC_PD_Net"], DIRECTION_LONG: defineDict["Sgit_FTDC_PD_Long"],
+                    DIRECTION_SHORT: defineDict["Sgit_FTDC_PD_Short"]}
 posiDirectionMapReverse = {v:k for k,v in posiDirectionMap.items()}
 
 # 委托状态类型映射
-orderStatusMap = {}
-orderStatusMap[STATUS_ALLTRADED] = defineDict["Sgit_FTDC_OST_AllTraded"]
-orderStatusMap[STATUS_PARTTRADED] = defineDict["Sgit_FTDC_OST_PartTradedQueueing"]
-orderStatusMap[STATUS_NOTTRADED] = defineDict["Sgit_FTDC_OST_NoTradeQueueing"]
-orderStatusMap[STATUS_CANCELLED] = defineDict["Sgit_FTDC_OST_Canceled"]
+orderStatusMap = {STATUS_ALLTRADED: defineDict["Sgit_FTDC_OST_AllTraded"],
+                  STATUS_PARTTRADED: defineDict["Sgit_FTDC_OST_PartTradedQueueing"],
+                  STATUS_NOTTRADED: defineDict["Sgit_FTDC_OST_NoTradeQueueing"],
+                  STATUS_CANCELLED: defineDict["Sgit_FTDC_OST_Canceled"]}
 orderStatusMapReverse = {v:k for k,v in orderStatusMap.items()}
 
 
@@ -272,10 +260,7 @@ class SgitMdApi(MdApi):
         """登录"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)    
     
@@ -477,10 +462,7 @@ class SgitTdApi(TdApi):
         """连接服务器"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)   
         
@@ -494,9 +476,7 @@ class SgitTdApi(TdApi):
     def qryPosition(self):
         """查询持仓"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryInvestorPosition(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -506,12 +486,8 @@ class SgitTdApi(TdApi):
         self.localID += 1
         strID = str(self.localID).rjust(12, '0')
         
-        req = {}
-        
-        req['InstrumentID'] = orderReq.symbol
-        req['LimitPrice'] = orderReq.price
-        req['VolumeTotalOriginal'] = orderReq.volume
-        
+        req = {'InstrumentID': orderReq.symbol, 'LimitPrice': orderReq.price, 'VolumeTotalOriginal': orderReq.volume}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
         try:
             req['OrderPriceType'] = priceTypeMap[orderReq.priceType]
@@ -554,15 +530,10 @@ class SgitTdApi(TdApi):
         
         self.reqID += 1
 
-        req = {}
-        req['InstrumentID'] = cancelOrderReq.symbol
-        req['ExchangeID'] = exchangeMap[cancelOrderReq.exchange]
-        req['OrderSysID'] = sysID
-        req['ActionFlag'] = defineDict['Sgit_FTDC_AF_Delete']
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
-        req['UserID'] = self.userID
-        
+        req = {'InstrumentID': cancelOrderReq.symbol, 'ExchangeID': exchangeMap[cancelOrderReq.exchange],
+               'OrderSysID': sysID, 'ActionFlag': defineDict['Sgit_FTDC_AF_Delete'], 'BrokerID': self.brokerID,
+               'InvestorID': self.userID, 'UserID': self.userID}
+
         self.reqOrderAction(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -595,7 +566,7 @@ class SgitTdApi(TdApi):
         
     #----------------------------------------------------------------------
     def onRspUserLogin(self, data, error, n, last):
-        '''登陆回报'''
+        """登陆回报"""
         # 如果登录成功，推送日志信息
         if error['ErrorID'] == 0:
             self.loginStatus = True
@@ -932,4 +903,3 @@ def print_dict(d):
     l.sort()
     for k in l:
         print k, ':', d[k]
-    

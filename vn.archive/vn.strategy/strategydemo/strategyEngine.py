@@ -641,5 +641,3 @@ class StrategyTemplate(object):
     def cancelStopOrder(self, so):
         """撤销停止单"""
         self.engine.cancelStopOrder(so)
-    
-    

@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 本文件中包含了CTA模块中用到的一些基础设置、类和常量等。
-'''
+"""
 
 from __future__ import division
 

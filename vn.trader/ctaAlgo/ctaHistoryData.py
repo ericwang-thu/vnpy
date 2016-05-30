@@ -18,11 +18,7 @@ from datayesClient import DatayesClient
 
 
 # 以下为vn.trader和通联数据规定的交易所代码映射 
-VT_TO_DATAYES_EXCHANGE = {}
-VT_TO_DATAYES_EXCHANGE[EXCHANGE_CFFEX] = 'CCFX'     # 中金所
-VT_TO_DATAYES_EXCHANGE[EXCHANGE_SHFE] = 'XSGE'      # 上期所 
-VT_TO_DATAYES_EXCHANGE[EXCHANGE_CZCE] = 'XZCE'       # 郑商所
-VT_TO_DATAYES_EXCHANGE[EXCHANGE_DCE] = 'XDCE'       # 大商所
+VT_TO_DATAYES_EXCHANGE = {EXCHANGE_CFFEX: 'CCFX', EXCHANGE_SHFE: 'XSGE', EXCHANGE_CZCE: 'XZCE', EXCHANGE_DCE: 'XDCE'}
 DATAYES_TO_VT_EXCHANGE = {v:k for k,v in VT_TO_DATAYES_EXCHANGE.items()}
 
 
@@ -47,7 +43,7 @@ class HistoryDataEngine(object):
         if today.weekday() == 5:
             today = today - oneday
         elif today.weekday() == 6:
-            today = today - oneday*2        
+            today -= oneday * 2
         
         return today.strftime('%Y%m%d')
     
@@ -75,16 +71,13 @@ class HistoryDataEngine(object):
 
         path = 'api/market/getMktMFutd.json'
         
-        params = {}
-        params['tradeDate'] = tradeDate
-        
+        params = {'tradeDate': tradeDate}
+
         data = self.datayesClient.downloadData(path, params)
         
         if data:
             for d in data:
-                symbolDict = {}
-                symbolDict['symbol'] = d['ticker']
-                symbolDict['productSymbol'] = d['contractObject']
+                symbolDict = {'symbol': d['ticker'], 'productSymbol': d['contractObject']}
                 flt = {'symbol': d['ticker']}
                 
                 self.dbClient[SETTING_DB_NAME]['FuturesSymbol'].update_one(flt, {'$set':symbolDict}, 
@@ -113,17 +106,14 @@ class HistoryDataEngine(object):
         if '0000' in symbol:
             path = 'api/market/getMktMFutd.json'
             
-            params = {}
-            params['contractObject'] = symbol.replace('0000', '')
-            params['mainCon'] = 1
+            params = {'contractObject': symbol.replace('0000', ''), 'mainCon': 1}
             if last:
                 params['startDate'] = last['date']
         # 交易合约
         else:
             path = 'api/market/getMktFutd.json'
             
-            params = {}
-            params['ticker'] = symbol
+            params = {'ticker': symbol}
             if last:
                 params['startDate'] = last['date']
         
@@ -190,10 +180,8 @@ class HistoryDataEngine(object):
         # 日内分钟行情只有具体合约
         path = 'api/market/getFutureBarRTIntraDay.json'
         
-        params = {}
-        params['instrumentID'] = symbol
-        params['unit'] = 1
-        
+        params = {'instrumentID': symbol, 'unit': 1}
+
         data = self.datayesClient.downloadData(path, params)
         
         if data:
@@ -240,15 +228,13 @@ class HistoryDataEngine(object):
 
         path = 'api/market/getMktEqud.json'
         
-        params = {}
-        params['tradeDate'] = tradeDate
-        
+        params = {'tradeDate': tradeDate}
+
         data = self.datayesClient.downloadData(path, params)
         
         if data:
             for d in data:
-                symbolDict = {}
-                symbolDict['symbol'] = d['ticker']
+                symbolDict = {'symbol': d['ticker']}
                 flt = {'symbol': d['ticker']}
                 
                 self.dbClient[SETTING_DB_NAME]['EquitySymbol'].update_one(flt, {'$set':symbolDict}, 
@@ -275,8 +261,7 @@ class HistoryDataEngine(object):
         # 开始下载数据
         path = 'api/market/getMktEqud.json'
             
-        params = {}
-        params['ticker'] = symbol
+        params = {'ticker': symbol}
         if last:
             params['startDate'] = last['date']
         

@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.xspeed的gateway接入
-'''
+"""
 
 import os
 import json
@@ -16,40 +16,30 @@ from vtGateway import *
 
 # 以下为一些VT类型和XSPEED类型的映射字典
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = defineDict["DFITC_LIMITORDER"]
-priceTypeMap[PRICETYPE_MARKETPRICE] = defineDict["DFITC_MKORDER"]
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: defineDict["DFITC_LIMITORDER"],
+                PRICETYPE_MARKETPRICE: defineDict["DFITC_MKORDER"]}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = defineDict['DFITC_SPD_BUY']
-directionMap[DIRECTION_SHORT] = defineDict['DFITC_SPD_SELL']
+directionMap = {DIRECTION_LONG: defineDict['DFITC_SPD_BUY'], DIRECTION_SHORT: defineDict['DFITC_SPD_SELL']}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = defineDict['DFITC_SPD_OPEN']
-offsetMap[OFFSET_CLOSE] = defineDict['DFITC_SPD_CLOSE']
-offsetMap[OFFSET_CLOSETODAY] = defineDict['DFITC_SPD_CLOSETODAY']
-offsetMap[OFFSET_CLOSEYESTERDAY] = defineDict['DFITC_SPD_CLOSE']
+offsetMap = {OFFSET_OPEN: defineDict['DFITC_SPD_OPEN'], OFFSET_CLOSE: defineDict['DFITC_SPD_CLOSE'],
+             OFFSET_CLOSETODAY: defineDict['DFITC_SPD_CLOSETODAY'],
+             OFFSET_CLOSEYESTERDAY: defineDict['DFITC_SPD_CLOSE']}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 # 交易所类型映射
-exchangeMap = {}
-exchangeMap[EXCHANGE_CFFEX] = defineDict['DFITC_EXCHANGE_CFFEX']
-exchangeMap[EXCHANGE_SHFE] = defineDict['DFITC_EXCHANGE_SHFE']
-exchangeMap[EXCHANGE_CZCE] = defineDict['DFITC_EXCHANGE_CZCE']
-exchangeMap[EXCHANGE_DCE] = defineDict['DFITC_EXCHANGE_DCE']
-exchangeMap[EXCHANGE_UNKNOWN] = ''
+exchangeMap = {EXCHANGE_CFFEX: defineDict['DFITC_EXCHANGE_CFFEX'], EXCHANGE_SHFE: defineDict['DFITC_EXCHANGE_SHFE'],
+               EXCHANGE_CZCE: defineDict['DFITC_EXCHANGE_CZCE'], EXCHANGE_DCE: defineDict['DFITC_EXCHANGE_DCE'],
+               EXCHANGE_UNKNOWN: ''}
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 委托状态类型映射
-orderStatusMap = {}
-orderStatusMap[STATUS_ALLTRADED] = defineDict["DFITC_SPD_FILLED"]
-orderStatusMap[STATUS_PARTTRADED] = defineDict["DFITC_SPD_PARTIAL"]
-orderStatusMap[STATUS_NOTTRADED] = defineDict["DFITC_SPD_IN_QUEUE"]
-orderStatusMap[STATUS_CANCELLED] = defineDict["DFITC_SPD_CANCELED"]
+orderStatusMap = {STATUS_ALLTRADED: defineDict["DFITC_SPD_FILLED"], STATUS_PARTTRADED: defineDict["DFITC_SPD_PARTIAL"],
+                  STATUS_NOTTRADED: defineDict["DFITC_SPD_IN_QUEUE"],
+                  STATUS_CANCELLED: defineDict["DFITC_SPD_CANCELED"]}
 orderStatusMapReverse = {v:k for k,v in orderStatusMap.items()}
 orderStatusMapReverse[defineDict["DFITC_SPD_PARTIAL_CANCELED"]] = STATUS_CANCELLED
 
@@ -242,11 +232,8 @@ class XspeedMdApi(MdApi):
         # 如果填入了用户名密码等，则登录
         if self.accountID and self.password:
             self.reqID += 1
-            req = {}
-            req['accountID'] = self.accountID
-            req['passwd'] = self.password
-            req['lRequestID'] = self.reqID
-            self.reqUserLogin(req)    
+            req = {'accountID': self.accountID, 'passwd': self.password, 'lRequestID': self.reqID}
+            self.reqUserLogin(req)
     
     #----------------------------------------------------------------------
     def close(self):
@@ -451,28 +438,21 @@ class XspeedTdApi(TdApi):
         # 如果填入了用户名密码等，则登录
         if self.accountID and self.password:
             self.reqID += 1
-            req = {}
-            req['accountID'] = self.accountID
-            req['passwd'] = self.password
-            req['lRequestID'] = self.reqID
-            self.reqUserLogin(req)  
+            req = {'accountID': self.accountID, 'passwd': self.password, 'lRequestID': self.reqID}
+            self.reqUserLogin(req)
         
     #----------------------------------------------------------------------
     def qryAccount(self):
         """查询账户"""
         self.reqID += 1
-        req = {}
-        req['lRequestID'] = self.reqID
-        req['accountID'] = self.accountID
+        req = {'lRequestID': self.reqID, 'accountID': self.accountID}
         self.reqQryCustomerCapital(req)
         
     #----------------------------------------------------------------------
     def qryPosition(self):
         """查询持仓"""
         self.reqID += 1
-        req = {}
-        req['lRequestID'] = self.reqID
-        req['accountID'] = self.accountID
+        req = {'lRequestID': self.reqID, 'accountID': self.accountID}
         self.reqQryPosition(req)
         
     #----------------------------------------------------------------------
@@ -481,11 +461,8 @@ class XspeedTdApi(TdApi):
         self.reqID += 1
         self.localID += 1
 
-        req = {}
-        req['instrumentID'] = orderReq.symbol
-        req['insertPrice'] = orderReq.price
-        req['orderAmount'] = orderReq.volume
-        
+        req = {'instrumentID': orderReq.symbol, 'insertPrice': orderReq.price, 'orderAmount': orderReq.volume}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
         try:
             req['orderType'] = priceTypeMap[orderReq.priceType]
@@ -511,12 +488,9 @@ class XspeedTdApi(TdApi):
         """撤单"""
         self.reqID += 1
 
-        req = {}
-        req['instrumentID'] = cancelOrderReq.symbol
-        req['localOrderID'] = int(cancelOrderReq.orderID)
-        req['accountID'] = self.accountID
-        req['lRequestID'] = self.reqID
-        
+        req = {'instrumentID': cancelOrderReq.symbol, 'localOrderID': int(cancelOrderReq.orderID),
+               'accountID': self.accountID, 'lRequestID': self.reqID}
+
         # 添加柜台委托号字段
         localID = int(cancelOrderReq.orderID)
         if localID in self.spdOrderDict:
@@ -571,9 +545,8 @@ class XspeedTdApi(TdApi):
             
             # 查询合约代码
             self.reqID += 1
-            req = {}
-            req['lRequestID'] = self.reqID
-            self.reqQryExchangeInstrument(req)          
+            req = {'lRequestID': self.reqID}
+            self.reqQryExchangeInstrument(req)
 
         # 否则，推送错误信息
         else:
@@ -936,17 +909,13 @@ class XspeedTdApi(TdApi):
             
             # 查询委托
             self.reqID += 1
-            req = {}
-            req['lRequestID'] = self.reqID
-            req['accountID'] = self.accountID
+            req = {'lRequestID': self.reqID, 'accountID': self.accountID}
             self.reqQryOrderInfo(req)
         
             # 查询成交
             self.reqID += 1
-            req = {}
-            req['lRequestID'] = self.reqID
-            req['accountID'] = self.accountID
-            self.reqQryMatchInfo(req)              
+            req = {'lRequestID': self.reqID, 'accountID': self.accountID}
+            self.reqQryMatchInfo(req)
         
     #----------------------------------------------------------------------
     def onRspArbitrageInstrument(self, data, error, last) :
@@ -1117,4 +1086,3 @@ class XspeedTdApi(TdApi):
     def onRspEquityComputMode(self, data) :
         """"""
         pass
-        

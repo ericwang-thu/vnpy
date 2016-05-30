@@ -1,11 +1,11 @@
 # encoding: UTF-8
 
-'''
+"""
 本文件中实现了风控引擎，用于提供一系列常用的风控功能：
 1. 委托流控（单位时间内最大允许发出的委托数量）
 2. 总成交限制（每日总成交数量限制）
 3. 单笔委托的委托数量控制
-'''
+"""
 
 import json
 import os
@@ -75,19 +75,10 @@ class RmEngine(object):
         """保存风控参数"""
         with open(self.settingFileName, 'w') as f:
             # 保存风控参数
-            d = {}
+            d = {'active': self.active, 'orderFlowLimit': self.orderFlowLimit, 'orderFlowClear': self.orderFlowClear,
+                 'orderSizeLimit': self.orderSizeLimit, 'tradeLimit': self.tradeLimit,
+                 'workingOrderLimit': self.workingOrderLimit}
 
-            d['active'] = self.active
-            
-            d['orderFlowLimit'] = self.orderFlowLimit
-            d['orderFlowClear'] = self.orderFlowClear
-            
-            d['orderSizeLimit'] = self.orderSizeLimit
-            
-            d['tradeLimit'] = self.tradeLimit
-            
-            d['workingOrderLimit'] = self.workingOrderLimit
-            
             # 写入json
             jsonD = json.dumps(d, indent=4)
             f.write(jsonD)

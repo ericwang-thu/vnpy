@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.lts的gateway接入
-'''
+"""
 
 import os
 import json
@@ -16,39 +16,30 @@ from vtGateway import *
 
 # 以下为一些VT类型和LTS类型的映射字典
 # 价格类型映射
-priceTypeMap= {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = defineDict["SECURITY_FTDC_OPT_LimitPrice"]
-priceTypeMap[PRICETYPE_MARKETPRICE] = defineDict["SECURITY_FTDC_OPT_AnyPrice"]
-priceTypeMap[PRICETYPE_FAK] = defineDict["SECURITY_FTDC_OPT_BestPrice"]
-priceTypeMap[PRICETYPE_FOK] = defineDict["SECURITY_FTDC_OPT_AllLimitPrice"]
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap= {PRICETYPE_LIMITPRICE: defineDict["SECURITY_FTDC_OPT_LimitPrice"],
+               PRICETYPE_MARKETPRICE: defineDict["SECURITY_FTDC_OPT_AnyPrice"],
+               PRICETYPE_FAK: defineDict["SECURITY_FTDC_OPT_BestPrice"],
+               PRICETYPE_FOK: defineDict["SECURITY_FTDC_OPT_AllLimitPrice"]}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = defineDict["SECURITY_FTDC_D_Buy"]
-directionMap[DIRECTION_SHORT] = defineDict["SECURITY_FTDC_D_Sell"]
+directionMap = {DIRECTION_LONG: defineDict["SECURITY_FTDC_D_Buy"], DIRECTION_SHORT: defineDict["SECURITY_FTDC_D_Sell"]}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = defineDict["SECURITY_FTDC_OF_Open"]
-offsetMap[OFFSET_CLOSE] = defineDict["SECURITY_FTDC_OF_Close"]
-offsetMap[OFFSET_CLOSETODAY] = defineDict["SECURITY_FTDC_OF_CloseToday"]
-offsetMap[OFFSET_CLOSEYESTERDAY] = defineDict["SECURITY_FTDC_OF_CloseYesterday"]
+offsetMap = {OFFSET_OPEN: defineDict["SECURITY_FTDC_OF_Open"], OFFSET_CLOSE: defineDict["SECURITY_FTDC_OF_Close"],
+             OFFSET_CLOSETODAY: defineDict["SECURITY_FTDC_OF_CloseToday"],
+             OFFSET_CLOSEYESTERDAY: defineDict["SECURITY_FTDC_OF_CloseYesterday"]}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 # 交易所类型映射
-exchangeMap = {}
-exchangeMap[EXCHANGE_SSE] = 'SSE'
-exchangeMap[EXCHANGE_SZSE] = 'SZE'
-exchangeMap[EXCHANGE_HKEX] = 'HGE'
+exchangeMap = {EXCHANGE_SSE: 'SSE', EXCHANGE_SZSE: 'SZE', EXCHANGE_HKEX: 'HGE'}
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 持仓类型映射
-posiDirectionMap = {}
-posiDirectionMap[DIRECTION_NET] = defineDict["SECURITY_FTDC_PD_Net"]
-posiDirectionMap[DIRECTION_LONG] = defineDict["SECURITY_FTDC_PD_Long"]
-posiDirectionMap[DIRECTION_SHORT] = defineDict["SECURITY_FTDC_PD_Short"]
+posiDirectionMap = {DIRECTION_NET: defineDict["SECURITY_FTDC_PD_Net"],
+                    DIRECTION_LONG: defineDict["SECURITY_FTDC_PD_Long"],
+                    DIRECTION_SHORT: defineDict["SECURITY_FTDC_PD_Short"]}
 posiDirectionMapReverse = {v:k for k,v in posiDirectionMap.items()}
 
 
@@ -393,10 +384,8 @@ class  LtsMdApi(MdApi):
     #----------------------------------------------------------------------
     def subscribe(self, subscribeReq):
         """订阅合约"""
-        req = {}
-        req['InstrumentID'] = str(subscribeReq.symbol)
-        req['ExchangeID'] = exchangeMap.get(str(subscribeReq.exchange), '')
-        
+        req = {'InstrumentID': str(subscribeReq.symbol), 'ExchangeID': exchangeMap.get(str(subscribeReq.exchange), '')}
+
         # 这里的设计是，如果尚未登录就调用了订阅方法
         # 则先保存订阅请求，登录完成后会自动订阅
         if self.loginStatus:
@@ -409,10 +398,7 @@ class  LtsMdApi(MdApi):
         """登录"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)    
 
@@ -749,13 +735,8 @@ class LtsTdApi(TdApi):
         """连接服务器"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
-            req['UserProductInfo'] = self.productInfo
-            req['AuthCode'] = self.authCode             
-            req['RandCode'] = self.randCode
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID,
+                   'UserProductInfo': self.productInfo, 'AuthCode': self.authCode, 'RandCode': self.randCode}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)   
         
@@ -765,13 +746,9 @@ class LtsTdApi(TdApi):
         self.reqID += 1
         self.orderRef += 1
         
-        req = {}
-        
-        req['InstrumentID'] = str(orderReq.symbol)
-        req['LimitPrice'] = str(orderReq.price)     # LTS里的价格是字符串
-        req['VolumeTotalOriginal'] = int(orderReq.volume)
-        req['ExchangeID'] = exchangeMap.get(orderReq.exchange, '')
-        
+        req = {'InstrumentID': str(orderReq.symbol), 'LimitPrice': str(orderReq.price),
+               'VolumeTotalOriginal': int(orderReq.volume), 'ExchangeID': exchangeMap.get(orderReq.exchange, '')}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
         try:
             req['OrderPriceType'] = priceTypeMap[orderReq.priceType]
@@ -806,18 +783,11 @@ class LtsTdApi(TdApi):
         """撤单"""
         self.reqID += 1
 
-        req = {}
-        
-        req['InstrumentID'] = cancelOrderReq.symbol
-        req['ExchangeID'] = cancelOrderReq.exchange
-        req['OrderRef'] = cancelOrderReq.orderID
-        req['FrontID'] = cancelOrderReq.frontID
-        req['SessionID'] = cancelOrderReq.sessionID
-        
-        req['ActionFlag'] = defineDict['SECURITY_FTDC_AF_Delete']
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
-        
+        req = {'InstrumentID': cancelOrderReq.symbol, 'ExchangeID': cancelOrderReq.exchange,
+               'OrderRef': cancelOrderReq.orderID, 'FrontID': cancelOrderReq.frontID,
+               'SessionID': cancelOrderReq.sessionID, 'ActionFlag': defineDict['SECURITY_FTDC_AF_Delete'],
+               'BrokerID': self.brokerID, 'InvestorID': self.userID}
+
         self.reqOrderAction(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -1206,13 +1176,8 @@ class LtsQryApi(QryApi):
         # 如果填入了用户名密码等，则登录
         
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
-            req['UserProductInfo'] = self.productInfo
-            req['AuthCode'] = self.authCode             
-            req['RandCode'] = self.randCode          
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID,
+                   'UserProductInfo': self.productInfo, 'AuthCode': self.authCode, 'RandCode': self.randCode}
             self.reqID += 1
             
             self.reqUserLogin(req, self.reqID)   
@@ -1222,24 +1187,17 @@ class LtsQryApi(QryApi):
         """查询账户"""
         self.reqID += 1
         #是否需要INVESTERID, BROKERID?
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryTradingAccount(req, self.reqID)
          
     #----------------------------------------------------------------------
     def qryPosition(self):
         """查询持仓"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
-        self.reqQryInvestorPosition(req, self.reqID)   
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
+        self.reqQryInvestorPosition(req, self.reqID)
          
     #----------------------------------------------------------------------
     def close(self):
         """关闭"""
         self.exit()    
-    
-        
-    

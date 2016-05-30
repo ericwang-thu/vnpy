@@ -5,9 +5,9 @@ import sys
 from time import sleep
 
 # 测试模块
-from vnltsmd import *
-
+from vnltsmd import MdApi
 #----------------------------------------------------------------------
+
 def print_dict(d):
     """按照键值打印一个字典"""
     for key,value in d.items():
@@ -111,11 +111,8 @@ def main():
     sleep(0.5)
     
     # 登陆
-    loginReq = {}                           # 创建一个空字典
-    loginReq['UserID'] = ''                 # 参数作为字典键值的方式传入
-    loginReq['Password'] = ''               # 键名和C++中的结构体成员名对应
-    loginReq['BrokerID'] = '2011'    
-    reqid = reqid + 1                       # 请求数必须保持唯一性
+    loginReq = {'UserID': '', 'Password': '', 'BrokerID': '2011'}  # 创建一个空字典
+    reqid += 1  # 请求数必须保持唯一性
     i = api.reqUserLogin(loginReq, 1)
     sleep(0.5)
     
@@ -128,9 +125,7 @@ def main():
     sleep(0.5)
     
     # 订阅合约，测试通过
-    subReq = {}
-    subReq['InstrumentID'] = '510050'
-    subReq['ExchangeID'] = 'SSE'
+    subReq = {'InstrumentID': '510050', 'ExchangeID': 'SSE'}
     i = api.subscribeMarketData(subReq)
     
     ## 退订合约，测试通过

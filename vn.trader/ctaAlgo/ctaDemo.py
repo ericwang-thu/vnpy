@@ -242,28 +242,28 @@ class OrderManagementDemo(CtaTemplate):
         """收到行情TICK推送（必须由用户继承实现）"""
 
         # 建立不成交买单测试单        
-        if self.lastOrder == None:
+        if self.lastOrder is None:
             self.buy(tick.lastprice - 10.0, 1)
 
         # CTA委托类型映射
-        if self.lastOrder != None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'开仓':
+        if self.lastOrder is not None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'开仓':
             self.orderType = u'买开'
 
-        elif self.lastOrder != None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'平仓':
+        elif self.lastOrder is not None and self.lastOrder.direction == u'多' and self.lastOrder.offset == u'平仓':
             self.orderType = u'买平'
 
-        elif self.lastOrder != None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'开仓':
+        elif self.lastOrder is not None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'开仓':
             self.orderType = u'卖开'
 
-        elif self.lastOrder != None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'平仓':
+        elif self.lastOrder is not None and self.lastOrder.direction == u'空' and self.lastOrder.offset == u'平仓':
             self.orderType = u'卖平'
                 
         # 不成交，即撤单，并追单
-        if self.lastOrder != None and self.lastOrder.status == u'未成交':
+        if self.lastOrder is not None and self.lastOrder.status == u'未成交':
 
             self.cancelOrder(self.lastOrder.vtOrderID)
             self.lastOrder = None
-        elif self.lastOrder != None and self.lastOrder.status == u'已撤销':
+        elif self.lastOrder is not None and self.lastOrder.status == u'已撤销':
         # 追单并设置为不能成交
             
             self.sendOrder(self.orderType, self.tick.lastprice - 10, 1)

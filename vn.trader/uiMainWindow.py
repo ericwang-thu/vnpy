@@ -366,4 +366,3 @@ class AboutWidget(QtGui.QDialog):
         vbox.addWidget(label)
 
         self.setLayout(vbox)
-    

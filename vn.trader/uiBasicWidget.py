@@ -429,7 +429,7 @@ class MarketMonitor(BasicMonitor):
 
 
 ########################################################################
-class LogMonitor(BasicMonitor):
+class LogMonitor(object, BasicMonitor):
     """日志监控"""
 
     #----------------------------------------------------------------------
@@ -450,7 +450,7 @@ class LogMonitor(BasicMonitor):
 
 
 ########################################################################
-class ErrorMonitor(BasicMonitor):
+class ErrorMonitor(object, BasicMonitor):
     """错误监控"""
 
     #----------------------------------------------------------------------
@@ -472,7 +472,7 @@ class ErrorMonitor(BasicMonitor):
 
 
 ########################################################################
-class TradeMonitor(BasicMonitor):
+class TradeMonitor(object, BasicMonitor):
     """成交监控"""
 
     #----------------------------------------------------------------------
@@ -500,7 +500,7 @@ class TradeMonitor(BasicMonitor):
 
 
 ########################################################################
-class OrderMonitor(BasicMonitor):
+class OrderMonitor(object, BasicMonitor):
     """委托监控"""
 
     #----------------------------------------------------------------------
@@ -558,7 +558,7 @@ class OrderMonitor(BasicMonitor):
 
 
 ########################################################################
-class PositionMonitor(BasicMonitor):
+class PositionMonitor(object, BasicMonitor):
     """持仓监控"""
     #----------------------------------------------------------------------
     def __init__(self, mainEngine, eventEngine, parent=None):
@@ -586,7 +586,7 @@ class PositionMonitor(BasicMonitor):
         
         
 ########################################################################
-class AccountMonitor(BasicMonitor):
+class AccountMonitor(object, BasicMonitor):
     """账户监控"""
 
     #----------------------------------------------------------------------
@@ -1041,7 +1041,7 @@ class TradingWidget(QtGui.QFrame):
 
 
 ########################################################################
-class ContractMonitor(BasicMonitor):
+class ContractMonitor(object, object, BasicMonitor):
     """合约查询"""
 
     #----------------------------------------------------------------------
@@ -1098,8 +1098,8 @@ class ContractMonitor(BasicMonitor):
                     cell.setFont(self.font)  # 如果设置了特殊字体，则进行单元格设置
                     
                 self.setItem(row, n, cell)
-            
-            row = row + 1
+
+            row += 1
     
     #----------------------------------------------------------------------
     def refresh(self):
@@ -1122,5 +1122,3 @@ class ContractMonitor(BasicMonitor):
         """显示"""
         super(ContractMonitor, self).show()
         self.refresh()
-    
-    

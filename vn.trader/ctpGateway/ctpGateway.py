@@ -1,11 +1,11 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.ctp的gateway接入
 
 考虑到现阶段大部分CTP中的ExchangeID字段返回的都是空值
 vtSymbol直接使用symbol
-'''
+"""
 
 
 import os
@@ -20,43 +20,32 @@ from vtGateway import *
 
 # 以下为一些VT类型和CTP类型的映射字典
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = defineDict["THOST_FTDC_OPT_LimitPrice"]
-priceTypeMap[PRICETYPE_MARKETPRICE] = defineDict["THOST_FTDC_OPT_AnyPrice"]
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: defineDict["THOST_FTDC_OPT_LimitPrice"],
+                PRICETYPE_MARKETPRICE: defineDict["THOST_FTDC_OPT_AnyPrice"]}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = defineDict['THOST_FTDC_D_Buy']
-directionMap[DIRECTION_SHORT] = defineDict['THOST_FTDC_D_Sell']
+directionMap = {DIRECTION_LONG: defineDict['THOST_FTDC_D_Buy'], DIRECTION_SHORT: defineDict['THOST_FTDC_D_Sell']}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 # 开平类型映射
-offsetMap = {}
-offsetMap[OFFSET_OPEN] = defineDict['THOST_FTDC_OF_Open']
-offsetMap[OFFSET_CLOSE] = defineDict['THOST_FTDC_OF_Close']
-offsetMap[OFFSET_CLOSETODAY] = defineDict['THOST_FTDC_OF_CloseToday']
-offsetMap[OFFSET_CLOSEYESTERDAY] = defineDict['THOST_FTDC_OF_CloseYesterday']
+offsetMap = {OFFSET_OPEN: defineDict['THOST_FTDC_OF_Open'], OFFSET_CLOSE: defineDict['THOST_FTDC_OF_Close'],
+             OFFSET_CLOSETODAY: defineDict['THOST_FTDC_OF_CloseToday'],
+             OFFSET_CLOSEYESTERDAY: defineDict['THOST_FTDC_OF_CloseYesterday']}
 offsetMapReverse = {v:k for k,v in offsetMap.items()}
 
 # 交易所类型映射
-exchangeMap = {}
+exchangeMap = {EXCHANGE_CFFEX: 'CFFEX', EXCHANGE_SHFE: 'SHFE', EXCHANGE_CZCE: 'CZCE', EXCHANGE_DCE: 'DCE',
+               EXCHANGE_UNKNOWN: ''}
 #exchangeMap[EXCHANGE_CFFEX] = defineDict['THOST_FTDC_EIDT_CFFEX']
 #exchangeMap[EXCHANGE_SHFE] = defineDict['THOST_FTDC_EIDT_SHFE']
 #exchangeMap[EXCHANGE_CZCE] = defineDict['THOST_FTDC_EIDT_CZCE']
 #exchangeMap[EXCHANGE_DCE] = defineDict['THOST_FTDC_EIDT_DCE']
-exchangeMap[EXCHANGE_CFFEX] = 'CFFEX'
-exchangeMap[EXCHANGE_SHFE] = 'SHFE'
-exchangeMap[EXCHANGE_CZCE] = 'CZCE'
-exchangeMap[EXCHANGE_DCE] = 'DCE'
-exchangeMap[EXCHANGE_UNKNOWN] = ''
 exchangeMapReverse = {v:k for k,v in exchangeMap.items()}
 
 # 持仓类型映射
-posiDirectionMap = {}
-posiDirectionMap[DIRECTION_NET] = defineDict["THOST_FTDC_PD_Net"]
-posiDirectionMap[DIRECTION_LONG] = defineDict["THOST_FTDC_PD_Long"]
-posiDirectionMap[DIRECTION_SHORT] = defineDict["THOST_FTDC_PD_Short"]
+posiDirectionMap = {DIRECTION_NET: defineDict["THOST_FTDC_PD_Net"], DIRECTION_LONG: defineDict["THOST_FTDC_PD_Long"],
+                    DIRECTION_SHORT: defineDict["THOST_FTDC_PD_Short"]}
 posiDirectionMapReverse = {v:k for k,v in posiDirectionMap.items()}
 
 
@@ -399,10 +388,7 @@ class CtpMdApi(MdApi):
         """登录"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)    
     
@@ -490,9 +476,7 @@ class CtpTdApi(TdApi):
             self.gateway.onLog(log)
             
             # 确认结算信息
-            req = {}
-            req['BrokerID'] = self.brokerID
-            req['InvestorID'] = self.userID
+            req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
             self.reqID += 1
             self.reqSettlementInfoConfirm(req, self.reqID)              
                 
@@ -1195,10 +1179,7 @@ class CtpTdApi(TdApi):
         """连接服务器"""
         # 如果填入了用户名密码等，则登录
         if self.userID and self.password and self.brokerID:
-            req = {}
-            req['UserID'] = self.userID
-            req['Password'] = self.password
-            req['BrokerID'] = self.brokerID
+            req = {'UserID': self.userID, 'Password': self.password, 'BrokerID': self.brokerID}
             self.reqID += 1
             self.reqUserLogin(req, self.reqID)   
         
@@ -1212,9 +1193,7 @@ class CtpTdApi(TdApi):
     def qryPosition(self):
         """查询持仓"""
         self.reqID += 1
-        req = {}
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
+        req = {'BrokerID': self.brokerID, 'InvestorID': self.userID}
         self.reqQryInvestorPosition(req, self.reqID)
         
     #----------------------------------------------------------------------
@@ -1223,30 +1202,19 @@ class CtpTdApi(TdApi):
         self.reqID += 1
         self.orderRef += 1
         
-        req = {}
-        
-        req['InstrumentID'] = orderReq.symbol
-        req['LimitPrice'] = orderReq.price
-        req['VolumeTotalOriginal'] = orderReq.volume
-        
+        req = {'InstrumentID': orderReq.symbol, 'LimitPrice': orderReq.price, 'VolumeTotalOriginal': orderReq.volume,
+               'OrderPriceType': priceTypeMap.get(orderReq.priceType, ''),
+               'Direction': directionMap.get(orderReq.direction, ''),
+               'CombOffsetFlag': offsetMap.get(orderReq.offset, ''), 'OrderRef': str(self.orderRef),
+               'InvestorID': self.userID, 'UserID': self.userID, 'BrokerID': self.brokerID,
+               'CombHedgeFlag': defineDict['THOST_FTDC_HF_Speculation'],
+               'ContingentCondition': defineDict['THOST_FTDC_CC_Immediately'],
+               'ForceCloseReason': defineDict['THOST_FTDC_FCC_NotForceClose'], 'IsAutoSuspend': 0,
+               'TimeCondition': defineDict['THOST_FTDC_TC_GFD'], 'VolumeCondition': defineDict['THOST_FTDC_VC_AV'],
+               'MinVolume': 1}
+
         # 下面如果由于传入的类型本接口不支持，则会返回空字符串
-        req['OrderPriceType'] = priceTypeMap.get(orderReq.priceType, '')
-        req['Direction'] = directionMap.get(orderReq.direction, '')
-        req['CombOffsetFlag'] = offsetMap.get(orderReq.offset, '')
-            
-        req['OrderRef'] = str(self.orderRef)
-        req['InvestorID'] = self.userID
-        req['UserID'] = self.userID
-        req['BrokerID'] = self.brokerID
-        
-        req['CombHedgeFlag'] = defineDict['THOST_FTDC_HF_Speculation']       # 投机单
-        req['ContingentCondition'] = defineDict['THOST_FTDC_CC_Immediately'] # 立即发单
-        req['ForceCloseReason'] = defineDict['THOST_FTDC_FCC_NotForceClose'] # 非强平
-        req['IsAutoSuspend'] = 0                                             # 非自动挂起
-        req['TimeCondition'] = defineDict['THOST_FTDC_TC_GFD']               # 今日有效
-        req['VolumeCondition'] = defineDict['THOST_FTDC_VC_AV']              # 任意成交量
-        req['MinVolume'] = 1                                                 # 最小成交量为1
-        
+
         # 判断FAK和FOK
         if orderReq.priceType == PRICETYPE_FAK:
             req['OrderPriceType'] = defineDict["THOST_FTDC_OPT_LimitPrice"]
@@ -1268,18 +1236,11 @@ class CtpTdApi(TdApi):
         """撤单"""
         self.reqID += 1
 
-        req = {}
-        
-        req['InstrumentID'] = cancelOrderReq.symbol
-        req['ExchangeID'] = cancelOrderReq.exchange
-        req['OrderRef'] = cancelOrderReq.orderID
-        req['FrontID'] = cancelOrderReq.frontID
-        req['SessionID'] = cancelOrderReq.sessionID
-        
-        req['ActionFlag'] = defineDict['THOST_FTDC_AF_Delete']
-        req['BrokerID'] = self.brokerID
-        req['InvestorID'] = self.userID
-        
+        req = {'InstrumentID': cancelOrderReq.symbol, 'ExchangeID': cancelOrderReq.exchange,
+               'OrderRef': cancelOrderReq.orderID, 'FrontID': cancelOrderReq.frontID,
+               'SessionID': cancelOrderReq.sessionID, 'ActionFlag': defineDict['THOST_FTDC_AF_Delete'],
+               'BrokerID': self.brokerID, 'InvestorID': self.userID}
+
         self.reqOrderAction(req, self.reqID)
         
     #----------------------------------------------------------------------

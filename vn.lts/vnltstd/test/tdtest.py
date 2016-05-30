@@ -5,7 +5,7 @@ import sys
 from time import sleep
 
 # 测试模块
-from vnltstd import *
+from vnltstd import TdApi
 from lts_data_type import defineDict
 
 #----------------------------------------------------------------------
@@ -337,19 +337,14 @@ def main():
     sleep(0.5)
     
     # 获取随机认证码
-    reqid = reqid + 1
+    reqid += 1
     api.reqFetchAuthRandCode({}, reqid)
     sleep(0.5)
     
     # 登陆，测试通过
-    loginReq = {}                           # 创建一个空字典
-    loginReq['UserID'] = ''                 # 参数作为字典键值的方式传入
-    loginReq['Password'] = ''               # 键名和C++中的结构体成员名对应
-    loginReq['BrokerID'] = '2011'    
-    loginReq['RandCode'] = api.randCode
-    loginReq['UserProductInfo'] = 'LTS-Test'
-    loginReq['AuthCode'] = 'N3EHKP4CYHZGM9VJ'
-    reqid = reqid + 1                       # 请求数必须保持唯一性
+    loginReq = {'UserID': '', 'Password': '', 'BrokerID': '2011', 'RandCode': api.randCode,
+                'UserProductInfo': 'LTS-Test', 'AuthCode': 'N3EHKP4CYHZGM9VJ'}  # 创建一个空字典
+    reqid += 1  # 请求数必须保持唯一性
     i = api.reqUserLogin(loginReq, reqid)
     sleep(0.5)
     
@@ -368,27 +363,16 @@ def main():
 
     ###############################################
     # 发单测试, 测试通过
-    reqid = reqid + 1
-    req = {}
-    req['InvestorID'] = api.userID
-    req['UserID'] = api.userID
-    req['BrokerID'] = api.brokerID
-    req['InstrumentID'] = '510050'
-    req['ExchangeID'] = 'SSE'
-    req['OrderPriceType'] = defineDict['SECURITY_FTDC_OPT_LimitPrice']
-    req['LimitPrice'] = '0.1850'
-    req['VolumeTotalOriginal'] = 1
-    req['Direction'] = defineDict['SECURITY_FTDC_D_Buy']
-    req['CombOffsetFlag'] = defineDict['SECURITY_FTDC_OF_Open']
-    req['OrderRef'] = '10'    
-    req['CombHedgeFlag'] = defineDict['SECURITY_FTDC_HF_Speculation']
-    req['ContingentCondition'] = defineDict['SECURITY_FTDC_CC_Immediately']
-    req['ForceCloseReason'] = defineDict['SECURITY_FTDC_FCC_NotForceClose']
-    req['IsAutoSuspend'] = 0
-    req['UserForceClose'] = 0
-    req['TimeCondition'] = defineDict['SECURITY_FTDC_TC_GFD']
-    req['VolumeCondition'] = defineDict['SECURITY_FTDC_VC_AV']
-    req['MinVolume'] = 1
+    reqid += 1
+    req = {'InvestorID': api.userID, 'UserID': api.userID, 'BrokerID': api.brokerID, 'InstrumentID': '510050',
+           'ExchangeID': 'SSE', 'OrderPriceType': defineDict['SECURITY_FTDC_OPT_LimitPrice'], 'LimitPrice': '0.1850',
+           'VolumeTotalOriginal': 1, 'Direction': defineDict['SECURITY_FTDC_D_Buy'],
+           'CombOffsetFlag': defineDict['SECURITY_FTDC_OF_Open'], 'OrderRef': '10',
+           'CombHedgeFlag': defineDict['SECURITY_FTDC_HF_Speculation'],
+           'ContingentCondition': defineDict['SECURITY_FTDC_CC_Immediately'],
+           'ForceCloseReason': defineDict['SECURITY_FTDC_FCC_NotForceClose'], 'IsAutoSuspend': 0, 'UserForceClose': 0,
+           'TimeCondition': defineDict['SECURITY_FTDC_TC_GFD'], 'VolumeCondition': defineDict['SECURITY_FTDC_VC_AV'],
+           'MinVolume': 1}
     i = api.reqOrderInsert(req, reqid)
     sleep(1.0)
     

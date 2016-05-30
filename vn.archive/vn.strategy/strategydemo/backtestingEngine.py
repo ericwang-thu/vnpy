@@ -113,36 +113,21 @@ class BacktestingEngine(object):
     def executeLimitOrder(self, ref, order, price):
         """限价单成交处理"""
         # 成交回报
-        self.tradeID = self.tradeID + 1
+        self.tradeID += 1
         
-        tradeData = {}
-        tradeData['InstrumentID'] = order.symbol
-        tradeData['OrderRef'] = ref
-        tradeData['TradeID'] = str(self.tradeID)
-        tradeData['Direction'] = order.direction
-        tradeData['OffsetFlag'] = order.offset
-        tradeData['Price'] = price
-        tradeData['Volume'] = order.volume
-        
+        tradeData = {'InstrumentID': order.symbol, 'OrderRef': ref, 'TradeID': str(self.tradeID),
+                     'Direction': order.direction, 'OffsetFlag': order.offset, 'Price': price, 'Volume': order.volume}
+
         tradeEvent = Event()
         tradeEvent.dict_['data'] = tradeData
         self.strategyEngine.updateTrade(tradeEvent)
         
         # 报单回报
-        orderData = {}
-        orderData['InstrumentID'] = order.symbol
-        orderData['OrderRef'] = ref
-        orderData['Direction'] = order.direction
-        orderData['CombOffsetFlag'] = order.offset
-        orderData['LimitPrice'] = price
-        orderData['VolumeTotalOriginal'] = order.volume
-        orderData['VolumeTraded'] = order.volume
-        orderData['InsertTime'] = ''
-        orderData['CancelTime'] = ''
-        orderData['FrontID'] = ''
-        orderData['SessionID'] = ''
-        orderData['OrderStatus'] = ''
-        
+        orderData = {'InstrumentID': order.symbol, 'OrderRef': ref, 'Direction': order.direction,
+                     'CombOffsetFlag': order.offset, 'LimitPrice': price, 'VolumeTotalOriginal': order.volume,
+                     'VolumeTraded': order.volume, 'InsertTime': '', 'CancelTime': '', 'FrontID': '', 'SessionID': '',
+                     'OrderStatus': ''}
+
         orderEvent = Event()
         orderEvent.dict_['data'] = orderData
         self.strategyEngine.updateOrder(orderEvent)
@@ -182,8 +167,8 @@ class BacktestingEngine(object):
         order.direction = direction
         order.volume = volume
         order.offset = offset
-        
-        self.orderRef = self.orderRef + 1
+
+        self.orderRef += 1
         self.dictOrder[str(self.orderRef)] = order
         
         return str(self.orderRef)
@@ -204,8 +189,7 @@ class BacktestingEngine(object):
     #----------------------------------------------------------------------
     def selectInstrument(self, symbol):
         """读取合约数据"""
-        d = {}
-        d['ExchangeID'] = 'BackTesting'
+        d = {'ExchangeID': 'BackTesting'}
         return d
     
     #----------------------------------------------------------------------
@@ -219,6 +203,3 @@ class BacktestingEngine(object):
     def subscribe(self, symbol, exchange):
         """仿真订阅合约"""
         pass
-        
-    
-    

@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 CTA模块相关的GUI控制组件
-'''
+"""
 
 
 from uiBasicWidget import QtGui, QtCore, BasicCell
@@ -257,14 +257,3 @@ class CtaEngineManager(QtGui.QWidget):
         """注册事件监听"""
         self.signal.connect(self.updateCtaLog)
         self.eventEngine.register(EVENT_CTA_LOG, self.signal.emit)
-        
-        
-    
-    
-    
-    
-
-
-
-    
-    

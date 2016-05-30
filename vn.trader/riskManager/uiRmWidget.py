@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 风控模块相关的GUI控制组件
-'''
+"""
 
 
 from uiBasicWidget import QtGui, QtCore
@@ -131,5 +131,3 @@ class RmEngineManager(QtGui.QWidget):
             self.buttonSwitchEngineStatus.setText(u'风控模块运行中')
         else:
             self.buttonSwitchEngineStatus.setText(u'风控模块未启动')
- 
-    

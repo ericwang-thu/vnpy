@@ -1,6 +1,6 @@
 # encoding: UTF-8
 
-'''
+"""
 vn.oanda的gateway接入
 
 由于OANDA采用的是外汇做市商的交易模式，因此和国内接口方面有若干区别，具体如下：
@@ -9,15 +9,15 @@ vn.oanda的gateway接入
 
 * OANDA的持仓管理分为单笔成交持仓（Trade数据，国内没有）
   和单一资产汇总持仓（Position数据）
-  
+
 * OANDA系统中的所有时间都采用UTC时间（世界协调时，中国是UTC+8）
 
 * 由于采用的是外汇做市商的模式，用户的限价委托当价格被触及时就会立即全部成交，
   不会出现部分成交的情况，因此委托状态只有已报、成交、撤销三种
-  
+
 * 外汇市场采用24小时交易，因此OANDA的委托不像国内收盘后自动失效，需要用户指定
   失效时间，本接口中默认设置为24个小时候失效
-'''
+"""
 
 
 import os
@@ -28,15 +28,11 @@ from vnoanda import OandaApi
 from vtGateway import *
 
 # 价格类型映射
-priceTypeMap = {}
-priceTypeMap[PRICETYPE_LIMITPRICE] = 'limit'
-priceTypeMap[PRICETYPE_MARKETPRICE] = 'market'
-priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()} 
+priceTypeMap = {PRICETYPE_LIMITPRICE: 'limit', PRICETYPE_MARKETPRICE: 'market'}
+priceTypeMapReverse = {v: k for k, v in priceTypeMap.items()}
 
 # 方向类型映射
-directionMap = {}
-directionMap[DIRECTION_LONG] = 'buy'
-directionMap[DIRECTION_SHORT] = 'sell'
+directionMap = {DIRECTION_LONG: 'buy', DIRECTION_SHORT: 'sell'}
 directionMapReverse = {v: k for k, v in directionMap.items()}
 
 
@@ -431,13 +427,10 @@ class Api(OandaApi):
     #----------------------------------------------------------------------
     def sendOrder_(self, orderReq):
         """发送委托"""
-        params = {}
-        params['instrument'] = orderReq.symbol
-        params['units'] = orderReq.volume
-        params['side'] = directionMap.get(orderReq.direction, '')
-        params['price'] = orderReq.price
-        params['type'] = priceTypeMap.get(orderReq.priceType, '')
-        
+        params = {'instrument': orderReq.symbol, 'units': orderReq.volume,
+                  'side': directionMap.get(orderReq.direction, ''), 'price': orderReq.price,
+                  'type': priceTypeMap.get(orderReq.priceType, '')}
+
         # 委托有效期24小时
         expire = datetime.datetime.now() + datetime.timedelta(days=1)
         params['expiry'] = expire.isoformat('T') + 'Z'

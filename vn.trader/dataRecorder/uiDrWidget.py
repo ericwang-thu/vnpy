@@ -1,8 +1,8 @@
 # encoding: UTF-8
 
-'''
+"""
 行情记录模块相关的GUI控制组件
-'''
+"""
 
 import json
 
@@ -144,12 +144,3 @@ class DrEngineManager(QtGui.QWidget):
                     self.activeTable.insertRow(0)
                     self.activeTable.setItem(0, 0, TableCell(activeSymbol))
                     self.activeTable.setItem(0, 1, TableCell(symbol))
-    
-    
-    
-    
-
-
-
-    
-    

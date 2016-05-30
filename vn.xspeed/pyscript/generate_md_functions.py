@@ -112,7 +112,7 @@ def createTask(cbName, cbArgsTypeList, cbArgsValueList, orignalLine):
     # define常量
     global define_count
     fdefine.write("#define " + cbName.upper() + ' ' + str(define_count) + '\n')
-    define_count = define_count + 1
+    define_count += 1
 
     # switch段代码
     fswitch.write("case " + cbName.upper() + ':\n')

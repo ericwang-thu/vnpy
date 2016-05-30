@@ -6,12 +6,10 @@ from Queue import Queue, Empty
 from threading import Thread
 
 
-API_SETTING = {}
-API_SETTING['practice'] = {'rest': 'https://api-fxpractice.oanda.com',
-                           'stream': 'https://stream-fxpractice.oanda.com'}
-API_SETTING['trade'] = {'rest': 'https://api-fxtrade.oanda.com',
-                        'stream': 'https://stream-fxtrade.oanda.com/'}
-
+API_SETTING = {'practice': {'rest': 'https://api-fxpractice.oanda.com',
+                            'stream': 'https://stream-fxpractice.oanda.com'},
+               'trade': {'rest': 'https://api-fxtrade.oanda.com',
+                         'stream': 'https://stream-fxtrade.oanda.com/'}}
 
 FUNCTIONCODE_GETINSTRUMENTS = 0
 FUNCTIONCODE_GETPRICES = 1

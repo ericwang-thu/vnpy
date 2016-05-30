@@ -5,7 +5,7 @@ import sys
 from time import sleep
 
 # 测试模块
-from vnltsqry import *
+from vnltsqry import QryApi
 from lts_data_type import defineDict
 
 #----------------------------------------------------------------------
@@ -333,20 +333,15 @@ def main():
     sleep(0.5)
     
     # 获取随机认证码
-    reqid = reqid + 1
+    reqid += 1
     api.reqFetchAuthRandCode({}, reqid)
     sleep(1)
     
     # 登陆，测试通过
-    reqid = reqid + 1
-    loginReq = {}                           # 创建一个空字典
-    loginReq['UserID'] = ''                 # 参数作为字典键值的方式传入
-    loginReq['Password'] = ''               # 键名和C++中的结构体成员名对应
-    loginReq['BrokerID'] = '2011'    
-    loginReq['RandCode'] = api.randCode
-    loginReq['UserProductInfo'] = 'LTS-Test'
-    loginReq['AuthCode'] = 'N3EHKP4CYHZGM9VJ'
-    reqid = reqid + 1                       # 请求数必须保持唯一性
+    reqid += 1
+    loginReq = {'UserID': '', 'Password': '', 'BrokerID': '2011', 'RandCode': api.randCode,
+                'UserProductInfo': 'LTS-Test', 'AuthCode': 'N3EHKP4CYHZGM9VJ'}  # 创建一个空字典
+    reqid += 1  # 请求数必须保持唯一性
     i = api.reqUserLogin(loginReq, reqid)
     sleep(1)
     
